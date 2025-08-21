@@ -1,4 +1,4 @@
-package com.rafael.personalexpensetracker.personal_expenses_tracker.models;
+package com.rafael.personalexpensetracker.personal_expenses_tracker.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ExpenseModel {
+public class ExpenseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

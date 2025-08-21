@@ -1,4 +1,4 @@
-package com.rafael.personalexpensetracker.personal_expenses_tracker.models;
+package com.rafael.personalexpensetracker.personal_expenses_tracker.entities;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,7 +7,7 @@ import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
-public class UserModel {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -15,5 +15,5 @@ public class UserModel {
     private String name;
 
     @OneToMany
-    private List<ExpenseModel> expenses;
+    private List<ExpenseEntity> expenses;
 }
