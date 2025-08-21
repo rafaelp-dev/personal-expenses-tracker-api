@@ -18,7 +18,8 @@ public class ExpenseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long expenseId;
+    private Long userId;
     private String name;
     private String category;
     private Integer price;
