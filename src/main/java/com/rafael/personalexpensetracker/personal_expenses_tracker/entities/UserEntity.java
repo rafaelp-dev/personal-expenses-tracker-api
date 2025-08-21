@@ -1,12 +1,15 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.entities;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-
+@Entity
+@Getter
+@Setter
 public class UserEntity {
 
     @Id
@@ -14,6 +17,7 @@ public class UserEntity {
     private Long userId;
     private String name;
 
-    @OneToMany
-    private List<ExpenseEntity> expenses;
+    public UserEntity(String name){
+        this.name = name;
+    }
 }
