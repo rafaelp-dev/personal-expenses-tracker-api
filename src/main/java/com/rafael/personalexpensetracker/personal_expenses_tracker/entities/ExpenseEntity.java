@@ -18,16 +18,13 @@ public class ExpenseEntity {
     private String category;
     private Integer price;
     private LocalDateTime date;
+    private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private UserEntity userEntity;
-
-    public ExpenseEntity(String name, String category, Integer price, LocalDateTime date, UserEntity userEntity) {
+    public ExpenseEntity(String name, String category, Integer price, LocalDateTime date, Long userId) {
         this.name = name;
         this.category = category;
         this.price = price;
         this.date = date;
-        this.userEntity = userEntity;
+        this.userId = userId;
     }
 }
