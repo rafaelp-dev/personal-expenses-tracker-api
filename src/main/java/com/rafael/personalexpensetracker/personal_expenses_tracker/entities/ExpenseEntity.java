@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "expenses")
 @Getter
 @Setter
 public class ExpenseEntity {
@@ -19,6 +20,8 @@ public class ExpenseEntity {
     private Integer price;
     private LocalDateTime date;
     private Long userId;
+
+    public ExpenseEntity(){}
 
     public ExpenseEntity(String name, String category, Integer price, LocalDateTime date, Long userId) {
         this.name = name;
