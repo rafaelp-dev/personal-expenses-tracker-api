@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -24,5 +26,9 @@ public class UserService {
         return userRepository.findById(id)
                 .map(user -> ResponseEntity.status(HttpStatus.OK).body(user))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    public ResponseEntity<UserEntity> createUser(UserEntity userEntity){
+        return ResponseEntity.status(HttpStatus.CREATED).body(userRepository.save(userEntity));
     }
 }
