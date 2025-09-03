@@ -15,8 +15,14 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public ResponseEntity getAllUsers(){
+    public ResponseEntity<List<UserEntity>> getAllUsers(){
         List<UserEntity> userEntityList = userRepository.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(userEntityList);
+    }
+
+    public ResponseEntity<UserEntity> getUserById(Long id){
+        return userRepository.findById(id)
+                .map(user -> ResponseEntity.status(HttpStatus.OK).body(user))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 }
