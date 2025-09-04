@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -33,5 +34,17 @@ public class UserController {
     public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user){
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id){
+        Optional<UserEntity> user = userService.getUserById(id);
+
+        if (user.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
+        }
+
+        userService.deleteUserById(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Usuário removido.");
     }
 }
