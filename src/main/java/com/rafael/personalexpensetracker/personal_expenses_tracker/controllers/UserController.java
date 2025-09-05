@@ -1,6 +1,7 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class UserController {
     public ResponseEntity<List<UserEntity>> getAllUsers(){
         List<UserEntity> userEntityList = userService.getAllUsers();
 
-        return ResponseEntity.status(HttpStatus.OK).body(userEntityList);
+        return ResponseEntity.ok(userEntityList);
     }
 
     @GetMapping("/{id}")
@@ -31,9 +32,11 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user){
+    public ResponseEntity<UserEntity> createUser(@Valid @RequestBody UserEntity user){
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
+        UserEntity userEntity = userService.createUser(user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userEntity);
     }
 
     @DeleteMapping("/{id}")

@@ -23,11 +23,11 @@ public class ExpenseEntity {
 
     public ExpenseEntity(){}
 
-    public ExpenseEntity(String name, String category, Integer price, LocalDateTime date, Long userId) {
+    public ExpenseEntity(String name, String category, Integer price, Long userId) {
         this.name = name;
         this.category = category;
         this.price = price;
-        this.date = date;
+        this.date = LocalDateTime.now();
         this.userId = userId;
     }
 }
