@@ -1,6 +1,7 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class UserController {
     public ResponseEntity<List<UserEntity>> getAllUsers(){
         List<UserEntity> userEntityList = userService.getAllUsers();
 
-        return ResponseEntity.ok(userEntityList);
+        return ResponseEntity.ok().body(userEntityList);
     }
 
     @GetMapping("/{id}")
@@ -49,5 +50,15 @@ public class UserController {
 
         userService.deleteUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body("Usuário removido.");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserEntity user){
+        try {
+            UserEntity userEntity = userService.updateUser(id, user);
+            return ResponseEntity.ok(userEntity);
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body(e.getMessage());
+        }
     }
 }

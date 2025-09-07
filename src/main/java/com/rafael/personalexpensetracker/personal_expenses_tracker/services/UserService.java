@@ -2,6 +2,7 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,5 +29,17 @@ public class UserService {
 
     public void deleteUserById(Long id){
         userRepository.deleteById(id);
+    }
+
+    public UserEntity updateUser(Long id, UserEntity userDetails){
+        Optional<UserEntity> user = userRepository.findById(id);
+
+        UserEntity updatedUser = user.orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        if (userDetails.getName() != null){
+            updatedUser.setName(userDetails.getName());
+        }
+
+        return userRepository.save(updatedUser);
     }
 }
