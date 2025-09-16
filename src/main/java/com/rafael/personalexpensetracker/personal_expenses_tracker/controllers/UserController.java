@@ -41,15 +41,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id){
-        Optional<UserEntity> user = userService.getUserById(id);
-
-        if (user.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+        if (userService.getUserById(id).isEmpty()){
+            return ResponseEntity.notFound().build();
         }
 
-        userService.deleteUserById(id);
-        return ResponseEntity.status(HttpStatus.OK).body("Usuário removido.");
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
