@@ -16,6 +16,7 @@ public class UserEntity {
     private Long userId;
 
     @NotBlank(message = "Nome do usuário não pode ser vazio ou nulo.")
+    @Column(nullable = false)
     private String name;
 
     public UserEntity(){}
