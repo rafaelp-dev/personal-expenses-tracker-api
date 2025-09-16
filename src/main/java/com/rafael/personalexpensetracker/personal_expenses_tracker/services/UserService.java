@@ -34,14 +34,12 @@ public class UserService {
     }
 
     public UserEntity updateUser(Long id, UserEntity userDetails){
-        Optional<UserEntity> user = userRepository.findById(id);
-
-        UserEntity updatedUser = user.orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
 
         if (userDetails.getName() != null){
-            updatedUser.setName(userDetails.getName());
+            user.setName(userDetails.getName());
         }
 
-        return userRepository.save(updatedUser);
+        return userRepository.save(user);
     }
 }
