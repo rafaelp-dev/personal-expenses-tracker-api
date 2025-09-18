@@ -22,6 +22,9 @@ public class ExpenseEntity {
     @NotBlank(message = "O nome da despesa não pode ser vazio ou nulo.")
     @Column(nullable = false)
     private String name;
+
+    @NotBlank(message = "A categoria da despesa não pode ser vazia ou nula.")
+    @Column(nullable = false)
     private String category;
 
     @NotNull(message = "O preço é obrigatório.")
@@ -30,15 +33,18 @@ public class ExpenseEntity {
     private Integer price;
 
     private LocalDateTime date;
-    private Long userId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     public ExpenseEntity(){}
 
-    public ExpenseEntity(String name, String category, Integer price, Long userId) {
+    public ExpenseEntity(String name, String category, Integer price, UserEntity user) {
         this.name = name;
         this.category = category;
         this.price = price;
         this.date = LocalDateTime.now();
-        this.userId = userId;
+        this.user = user;
     }
 }
