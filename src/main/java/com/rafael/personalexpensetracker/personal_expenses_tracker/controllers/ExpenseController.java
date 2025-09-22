@@ -2,11 +2,10 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.ExpenseService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,4 +31,13 @@ public class ExpenseController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PostMapping
+    public ResponseEntity<ExpenseEntity> createExpense(@Valid @RequestBody ExpenseEntity expense){
+        ExpenseEntity expenseEntity = expenseService.createExpense(expense);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(expenseEntity);
+    }
+
+
 }
