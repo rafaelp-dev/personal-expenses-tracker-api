@@ -3,7 +3,6 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
