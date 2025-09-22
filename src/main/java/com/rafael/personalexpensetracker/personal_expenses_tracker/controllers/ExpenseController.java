@@ -2,6 +2,7 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.ExpenseService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +51,13 @@ public class ExpenseController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseEntity expense){
+        try {
+            ExpenseEntity expenseEntity = expenseService.updateExpense(id, expense);
+            return ResponseEntity.ok().body(expenseEntity);
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }
