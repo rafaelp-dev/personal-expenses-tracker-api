@@ -39,5 +39,16 @@ public class ExpenseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(expenseEntity);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteExpenseById(@PathVariable Long id){
+        if (expenseService.getExpenseById(id).isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        expenseService.deleteExpenseById(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
