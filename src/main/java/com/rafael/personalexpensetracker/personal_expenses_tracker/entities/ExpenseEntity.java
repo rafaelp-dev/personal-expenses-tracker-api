@@ -38,7 +38,9 @@ public class ExpenseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    public ExpenseEntity(){}
+    public ExpenseEntity(){
+        this.date = LocalDateTime.now();
+    }
 
     public ExpenseEntity(String name, String category, Integer price, UserEntity user) {
         this.name = name;

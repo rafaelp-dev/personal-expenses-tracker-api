@@ -37,8 +37,8 @@ public class ExpenseService {
 
         if (expense != null){
             expense.setName(expenseDetails.getName());
-            expense.setCategory(expense.getCategory());
-            expense.setPrice(expense.getPrice());
+            expense.setCategory(expenseDetails.getCategory());
+            expense.setPrice(expenseDetails.getPrice());
             expense.setUser(expenseDetails.getUser());
         }
 
