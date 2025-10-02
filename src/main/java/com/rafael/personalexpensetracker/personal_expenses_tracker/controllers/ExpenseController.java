@@ -60,4 +60,14 @@ public class ExpenseController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<List<ExpenseEntity>> findExpensesByUserId(@PathVariable Long id){
+        List<ExpenseEntity> expenses = expenseService.findByUserId(id);
+        if (expenses.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(expenses);
+    }
 }

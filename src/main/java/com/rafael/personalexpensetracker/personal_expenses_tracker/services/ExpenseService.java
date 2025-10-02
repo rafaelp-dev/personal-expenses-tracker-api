@@ -1,6 +1,7 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.ExpenseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -43,5 +44,9 @@ public class ExpenseService {
         }
 
         return expenseRepository.save(expense);
+    }
+
+    public List<ExpenseEntity> findByUserId(Long id){
+        return expenseRepository.findByUser_UserId(id);
     }
 }
