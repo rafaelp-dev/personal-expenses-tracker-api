@@ -3,10 +3,11 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -17,11 +18,18 @@ public class UserService {
     }
 
     public List<UserEntity> getAllUsers(){
-        return userRepository.findAll();
+        List<UserEntity> userEntityList = userRepository.findAll();
+
+        if (userEntityList.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Lista de clientes vazia.");
+        }
+
+        return userEntityList;
     }
 
-    public Optional<UserEntity> getUserById(Long id){
-        return userRepository.findById(id);
+    public UserEntity getUserById(Long id){
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
     }
 
     public UserEntity createUser(UserEntity user){
@@ -29,11 +37,15 @@ public class UserService {
     }
 
     public void deleteUserById(Long id){
+        UserEntity userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
+
         userRepository.deleteById(id);
     }
 
     public UserEntity updateUser(Long id, UserEntity userDetails){
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
 
         if (userDetails.getName() != null){
             user.setName(userDetails.getName());
