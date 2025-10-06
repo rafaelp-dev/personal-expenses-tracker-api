@@ -20,7 +20,7 @@ public class UserService {
         List<UserEntity> userEntityList = userRepository.findAll();
 
         if (userEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+            throw new ResponseStatusException(HttpStatus.OK);
         }
 
         return userEntityList;

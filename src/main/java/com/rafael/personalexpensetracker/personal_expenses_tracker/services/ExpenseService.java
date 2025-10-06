@@ -21,7 +21,7 @@ public class ExpenseService {
         List<ExpenseEntity> expenseEntityList = expenseRepository.findAll();
 
         if (expenseEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+            throw new ResponseStatusException(HttpStatus.OK);
         }
 
         return expenseEntityList;
@@ -59,7 +59,7 @@ public class ExpenseService {
         List<ExpenseEntity> expenseEntityList = expenseRepository.findByUser_UserId(id);
 
         if (expenseEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+            throw new ResponseStatusException(HttpStatus.OK);
         }
 
         return expenseEntityList;
