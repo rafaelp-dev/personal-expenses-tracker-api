@@ -21,7 +21,7 @@ public class UserService {
         List<UserEntity> userEntityList = userRepository.findAll();
 
         if (userEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Lista de clientes vazia.");
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Lista de usuários vazia.");
         }
 
         return userEntityList;
