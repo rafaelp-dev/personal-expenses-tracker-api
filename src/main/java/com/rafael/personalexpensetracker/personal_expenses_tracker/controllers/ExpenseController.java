@@ -28,9 +28,9 @@ public class ExpenseController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ExpenseEntity> getExpenseById(@PathVariable Long id){
-        return expenseService.getExpenseById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        ExpenseEntity expenseEntity = expenseService.getExpenseById(id);
+
+        return ResponseEntity.ok().body(expenseEntity);
     }
 
     @PostMapping
@@ -42,10 +42,6 @@ public class ExpenseController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExpenseById(@PathVariable Long id){
-        if (expenseService.getExpenseById(id).isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
-
         expenseService.deleteExpenseById(id);
 
         return ResponseEntity.noContent().build();
@@ -53,21 +49,15 @@ public class ExpenseController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseEntity expense){
-        try {
-            ExpenseEntity expenseEntity = expenseService.updateExpense(id, expense);
-            return ResponseEntity.ok().body(expenseEntity);
-        }catch (EntityNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        ExpenseEntity expenseEntity = expenseService.updateExpense(id, expense);
+
+        return ResponseEntity.ok().body(expenseEntity);
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<List<ExpenseEntity>> findExpensesByUserId(@PathVariable Long id){
-        List<ExpenseEntity> expenses = expenseService.findByUserId(id);
-        if (expenses.isEmpty()){
-            return ResponseEntity.noContent().build();
-        }
+        List<ExpenseEntity> expenseEntityList = expenseService.findByUserId(id);
 
-        return ResponseEntity.ok(expenses);
+        return ResponseEntity.ok().body(expenseEntityList);
     }
 }
