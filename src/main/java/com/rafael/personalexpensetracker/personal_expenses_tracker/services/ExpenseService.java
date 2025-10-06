@@ -2,7 +2,6 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.ExpenseRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,7 +21,7 @@ public class ExpenseService {
         List<ExpenseEntity> expenseEntityList = expenseRepository.findAll();
 
         if (expenseEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Lista de despesas vazia.");
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
         }
 
         return expenseEntityList;
@@ -48,23 +47,21 @@ public class ExpenseService {
         ExpenseEntity expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
 
-        if (expense != null){
-            expense.setName(expenseDetails.getName());
-            expense.setCategory(expenseDetails.getCategory());
-            expense.setPrice(expenseDetails.getPrice());
-            expense.setUser(expenseDetails.getUser());
-        }
+        if (expense.getName() != null) expense.setName(expenseDetails.getName());
+        if (expense.getCategory() != null) expense.setCategory(expenseDetails.getCategory());
+        if (expense.getPrice() != null) expense.setPrice(expenseDetails.getPrice());
+        if (expense.getUser() != null) expense.setUser(expenseDetails.getUser());
 
         return expenseRepository.save(expense);
     }
 
     public List<ExpenseEntity> findByUserId(Long id){
-        List<ExpenseEntity> expenseEntityList = expenseRepository.findAll();
+        List<ExpenseEntity> expenseEntityList = expenseRepository.findByUser_UserId(id);
 
         if (expenseEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Lista de gastos de usuário com ID: " + id + " vazia.");
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
         }
 
-        return expenseRepository.findByUser_UserId(id);
+        return expenseEntityList;
     }
 }

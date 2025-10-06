@@ -2,7 +2,6 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,7 +20,7 @@ public class UserService {
         List<UserEntity> userEntityList = userRepository.findAll();
 
         if (userEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Lista de usuários vazia.");
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
         }
 
         return userEntityList;
@@ -47,9 +46,7 @@ public class UserService {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
 
-        if (userDetails.getName() != null){
-            user.setName(userDetails.getName());
-        }
+        if (userDetails.getName() != null) user.setName(userDetails.getName());
 
         return userRepository.save(user);
     }

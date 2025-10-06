@@ -2,7 +2,6 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.ExpenseService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
