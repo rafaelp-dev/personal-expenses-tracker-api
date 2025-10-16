@@ -32,6 +32,12 @@ public class UserService {
     }
 
     public UserEntity createUser(UserEntity user){
+        UserEntity userEntity = userRepository.findByEmail(user.getEmail());
+
+        if (userEntity != null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com email: " + user.getEmail() + " já existe");
+        }
+
         return userRepository.save(user);
     }
 
@@ -47,6 +53,7 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
 
         if (userDetails.getName() != null) user.setName(userDetails.getName());
+        if (userDetails.getEmail() != null) user.setEmail(userDetails.getEmail());
 
         return userRepository.save(user);
     }
