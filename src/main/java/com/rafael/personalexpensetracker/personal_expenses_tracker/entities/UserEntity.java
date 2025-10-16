@@ -19,9 +19,14 @@ public class UserEntity {
     @Column(nullable = false)
     private String name;
 
+    @NotBlank(message = "Email não pode ser vazio ou nulo.")
+    @Column(nullable = false)
+    private String email;
+
     public UserEntity(){}
 
-    public UserEntity(String name){
+    public UserEntity(String name, String email){
         this.name = name;
+        this.email = email;
     }
 }
