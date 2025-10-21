@@ -1,5 +1,6 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.UserResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -26,9 +27,11 @@ public class UserService {
         return userEntityList;
     }
 
-    public UserEntity getUserById(Long id){
-        return userRepository.findById(id)
+    public UserResponseDto getUserById(Long id){
+        UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
+
+        return new UserResponseDto(userEntity.getUserId(), userEntity.getName(), userEntity.getEmail());
     }
 
     public UserEntity createUser(UserEntity user){

@@ -1,4 +1,5 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.UserResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
 import jakarta.validation.Valid;
@@ -25,10 +26,10 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserEntity> getUserById(@PathVariable Long id){
-        UserEntity userEntity = userService.getUserById(id);
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id){
+        UserResponseDto userResponseDto = userService.getUserById(id);
 
-        return ResponseEntity.ok().body(userEntity);
+        return ResponseEntity.ok().body(userResponseDto);
     }
 
     @PostMapping
