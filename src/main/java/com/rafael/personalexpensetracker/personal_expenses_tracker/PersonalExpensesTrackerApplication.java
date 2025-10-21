@@ -10,4 +10,5 @@ public class PersonalExpensesTrackerApplication {
 		SpringApplication.run(PersonalExpensesTrackerApplication.class, args);
 	}
 
+    //teste
 }
