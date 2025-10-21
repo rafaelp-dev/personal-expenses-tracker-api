@@ -1,9 +1,11 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.UserRequestDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.UserResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,14 +36,24 @@ public class UserService {
         return new UserResponseDto(userEntity.getUserId(), userEntity.getName(), userEntity.getEmail());
     }
 
-    public UserEntity createUser(UserEntity user){
-        UserEntity userEntity = userRepository.findByEmail(user.getEmail());
+    public UserResponseDto createUser(UserRequestDto userRequestDto){
+        UserEntity verifyEmail = userRepository.findByEmail(userRequestDto.email());
 
-        if (userEntity != null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com email: " + user.getEmail() + " já existe");
+        if (verifyEmail != null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com email: " + userRequestDto.email() + " já existe");
         }
 
-        return userRepository.save(user);
+        UserEntity userEntity = new UserEntity(userRequestDto.name(),
+                userRequestDto.email()
+        );
+
+        userRepository.save(userEntity);
+
+        return new UserResponseDto(
+                userEntity.getUserId(),
+                userEntity.getName(),
+                userEntity.getEmail()
+        );
     }
 
     public void deleteUserById(Long id){

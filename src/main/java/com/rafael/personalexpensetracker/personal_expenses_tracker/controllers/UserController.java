@@ -1,4 +1,5 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.UserRequestDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.UserResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
@@ -33,10 +34,10 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserEntity> createUser(@Valid @RequestBody UserEntity user){
-        UserEntity userEntity = userService.createUser(user);
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto){
+        UserResponseDto userResponseDto = userService.createUser(userRequestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userEntity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
 
     @DeleteMapping("/{id}")
