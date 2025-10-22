@@ -5,7 +5,6 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,7 +32,11 @@ public class UserService {
         UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
 
-        return new UserResponseDto(userEntity.getUserId(), userEntity.getName(), userEntity.getEmail());
+        return new UserResponseDto(
+                userEntity.getUserId(),
+                userEntity.getName(),
+                userEntity.getEmail()
+        );
     }
 
     public UserResponseDto createUser(UserRequestDto userRequestDto){
@@ -63,13 +66,19 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public UserEntity updateUser(Long id, UserEntity userDetails){
+    public UserResponseDto updateUser(Long id, UserRequestDto userRequestDto){
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
 
-        if (userDetails.getName() != null) user.setName(userDetails.getName());
-        if (userDetails.getEmail() != null) user.setEmail(userDetails.getEmail());
+        if (userRequestDto.name() != null) user.setName(userRequestDto.name());
+        if (userRequestDto.email() != null) user.setEmail(userRequestDto.email());
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return new UserResponseDto(
+                user.getUserId(),
+                user.getName(),
+                user.getEmail()
+        );
     }
 }
