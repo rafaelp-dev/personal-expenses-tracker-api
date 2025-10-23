@@ -28,7 +28,7 @@ public class ExpenseService {
 
     public ExpenseEntity getExpenseById(Long id){
         return expenseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado."));
     }
 
     public ExpenseEntity createExpense(ExpenseEntity expense){
@@ -37,14 +37,14 @@ public class ExpenseService {
 
     public void deleteExpenseById(Long id){
         ExpenseEntity expenseEntity = expenseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado."));
 
         expenseRepository.deleteById(id);
     }
 
     public ExpenseEntity updateExpense(Long id, ExpenseEntity expenseDetails){
         ExpenseEntity expense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado."));
 
         if (expense.getName() != null) expense.setName(expenseDetails.getName());
         if (expense.getCategory() != null) expense.setCategory(expenseDetails.getCategory());
