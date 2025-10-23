@@ -18,14 +18,21 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<UserEntity> getAllUsers(){
+    public List<UserResponseDto> getAllUsers(){
         List<UserEntity> userEntityList = userRepository.findAll();
 
         if (userEntityList.isEmpty()){
             throw new ResponseStatusException(HttpStatus.OK);
         }
 
-        return userEntityList;
+        return userEntityList
+                .stream()
+                .map(user -> new UserResponseDto(
+                        user.getUserId(),
+                        user.getName(),
+                        user.getEmail())
+                )
+                .toList();
     }
 
     public UserResponseDto getUserById(Long id){
@@ -63,7 +70,7 @@ public class UserService {
         UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
 
-        userRepository.deleteById(id);
+        userRepository.delete(userEntity);
     }
 
     public UserResponseDto updateUser(Long id, UserRequestDto userRequestDto){

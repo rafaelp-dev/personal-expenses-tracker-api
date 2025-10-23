@@ -20,10 +20,10 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserEntity>> getAllUsers(){
-        List<UserEntity> userEntityList = userService.getAllUsers();
+    public ResponseEntity<List<UserResponseDto>> getAllUsers(){
+        List<UserResponseDto> userResponseDtos = userService.getAllUsers();
 
-        return ResponseEntity.ok().body(userEntityList);
+        return ResponseEntity.ok().body(userResponseDtos);
     }
 
     @GetMapping("/{id}")
