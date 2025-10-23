@@ -15,11 +15,11 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
 
-    @NotBlank(message = "Nome do usuário não pode ser vazio ou nulo.")
+    @NotBlank(message = "O nome do usuário não pode estar vazio.")
     @Column(nullable = false)
     private String name;
 
-    @NotBlank(message = "Email não pode ser vazio ou nulo.")
+    @NotBlank(message = "O email do usuário não pode estar vazio.")
     @Column(nullable = false)
     private String email;
 

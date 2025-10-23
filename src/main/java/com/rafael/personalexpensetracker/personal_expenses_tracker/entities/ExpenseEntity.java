@@ -19,16 +19,16 @@ public class ExpenseEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long expenseId;
 
-    @NotBlank(message = "O nome da despesa não pode ser vazio ou nulo.")
+    @NotBlank(message = "O nome do gasto não pode estar vazio.")
     @Column(nullable = false)
     private String name;
 
-    @NotBlank(message = "A categoria da despesa não pode ser vazia ou nula.")
+    @NotBlank(message = "A categoria não pode estar vazia.")
     @Column(nullable = false)
     private String category;
 
-    @NotNull(message = "O preço é obrigatório.")
-    @Positive(message = "O preço deve ser maior que zero.")
+    @NotNull(message = "O preço do gasto não pode estar vazio.")
+    @Positive(message = "O preço do gasto deve ser maior do que 0.")
     @Column(nullable = false)
     private Integer price;
 
