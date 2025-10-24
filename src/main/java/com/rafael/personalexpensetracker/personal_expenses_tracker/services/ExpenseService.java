@@ -1,5 +1,6 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.ExpenseResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.ExpenseRepository;
 import org.springframework.http.HttpStatus;
@@ -16,14 +17,22 @@ public class ExpenseService {
         this.expenseRepository = expenseRepository;
     }
 
-    public List<ExpenseEntity> getAllExpenses(){
+    public List<ExpenseResponseDto> getAllExpenses(){
         List<ExpenseEntity> expenseEntityList = expenseRepository.findAll();
 
         if (expenseEntityList.isEmpty()){
             throw new ResponseStatusException(HttpStatus.OK);
         }
 
-        return expenseEntityList;
+        return expenseEntityList.stream()
+                .map(expense-> new ExpenseResponseDto(
+                        expense.getExpenseId(),
+                        expense.getName(),
+                        expense.getCategory(),
+                        expense.getPrice(),
+                        expense.getDate(),
+                        expense.getUser().getName()))
+                .toList();
     }
 
     public ExpenseEntity getExpenseById(Long id){

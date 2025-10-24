@@ -1,5 +1,6 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.ExpenseResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.ExpenseService;
 import jakarta.validation.Valid;
@@ -19,10 +20,10 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExpenseEntity>> getAllExpenses(){
-        List<ExpenseEntity> expenses = expenseService.getAllExpenses();
+    public ResponseEntity<List<ExpenseResponseDto>> getAllExpenses(){
+        List<ExpenseResponseDto> expenseResponseDto = expenseService.getAllExpenses();
 
-        return ResponseEntity.ok().body(expenses);
+        return ResponseEntity.ok().body(expenseResponseDto);
     }
 
     @GetMapping("/{id}")
