@@ -35,9 +35,18 @@ public class ExpenseService {
                 .toList();
     }
 
-    public ExpenseEntity getExpenseById(Long id){
-        return expenseRepository.findById(id)
+    public ExpenseResponseDto getExpenseById(Long id){
+        ExpenseEntity expenseEntity = expenseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado."));
+
+        return new ExpenseResponseDto(
+                expenseEntity.getExpenseId(),
+                expenseEntity.getName(),
+                expenseEntity.getCategory(),
+                expenseEntity.getPrice(),
+                expenseEntity.getDate(),
+                expenseEntity.getUser().getName()
+        );
     }
 
     public ExpenseEntity createExpense(ExpenseEntity expense){
@@ -45,8 +54,8 @@ public class ExpenseService {
     }
 
     public void deleteExpenseById(Long id){
-        ExpenseEntity expenseEntity = expenseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado."));
+//        ExpenseEntity expenseEntity = expenseRepository.findById(id)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado."));
 
         expenseRepository.deleteById(id);
     }
