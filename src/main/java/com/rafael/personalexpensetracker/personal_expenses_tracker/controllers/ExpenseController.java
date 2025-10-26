@@ -2,7 +2,6 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.ExpenseRequestDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.ExpenseResponseDto;
-import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.ExpenseService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,9 +21,9 @@ public class ExpenseController {
 
     @GetMapping
     public ResponseEntity<List<ExpenseResponseDto>> getAllExpenses(){
-        List<ExpenseResponseDto> expenseResponseDto = expenseService.getAllExpenses();
+        List<ExpenseResponseDto> expenseResponseDtos = expenseService.getAllExpenses();
 
-        return ResponseEntity.ok().body(expenseResponseDto);
+        return ResponseEntity.ok().body(expenseResponseDtos);
     }
 
     @GetMapping("/{id}")

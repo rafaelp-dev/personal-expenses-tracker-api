@@ -1,7 +1,6 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.UserRequestDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.UserResponseDto;
-import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
