@@ -6,7 +6,6 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.Expe
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.ExpenseRepository;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,10 +25,6 @@ public class ExpenseService {
 
     public List<ExpenseResponseDto> getAllExpenses(){
         List<ExpenseEntity> expenseEntityList = expenseRepository.findAll();
-
-        if (expenseEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.OK);
-        }
 
         return expenseEntityList.stream()
                 .map(expense-> new ExpenseResponseDto(
@@ -60,7 +55,12 @@ public class ExpenseService {
         UserEntity userEntity = userRepository.findById(expenseRequestDto.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + expenseRequestDto.userId() + " não encontrado."));
 
-        ExpenseEntity expenseEntity = new ExpenseEntity(expenseRequestDto.name(), expenseRequestDto.category(), expenseRequestDto.price(),userEntity);
+        ExpenseEntity expenseEntity = new ExpenseEntity(
+                expenseRequestDto.name(),
+                expenseRequestDto.category(),
+                expenseRequestDto.price(),
+                userEntity
+        );
 
         expenseRepository.save(expenseEntity);
 
@@ -75,8 +75,9 @@ public class ExpenseService {
     }
 
     public void deleteExpenseById(Long id){
-//        ExpenseEntity expenseEntity = expenseRepository.findById(id)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado."));
+        if (!expenseRepository.existsById(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado.");
+        }
 
         expenseRepository.deleteById(id);
     }
