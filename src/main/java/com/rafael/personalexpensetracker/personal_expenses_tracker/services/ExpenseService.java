@@ -107,13 +107,16 @@ public class ExpenseService {
         );
     }
 
-    public List<ExpenseEntity> findByUserId(Long id){
+    public List<ExpenseResponseDto> findByUserId(Long id){
         List<ExpenseEntity> expenseEntityList = expenseRepository.findByUser_UserId(id);
 
-        if (expenseEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.OK);
-        }
-
-        return expenseEntityList;
+        return expenseEntityList.stream().map(expense -> new ExpenseResponseDto(
+                expense.getExpenseId(),
+                expense.getName(),
+                expense.getCategory(),
+                expense.getPrice(),
+                expense.getDate(),
+                expense.getUser().getName())
+        ).toList();
     }
 }
