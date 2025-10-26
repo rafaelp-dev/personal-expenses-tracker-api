@@ -1,8 +1,12 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.ExpenseRequestDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.ExpenseResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.ExpenseRepository;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,8 +17,11 @@ import java.util.List;
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
 
-    public ExpenseService(ExpenseRepository expenseRepository){
+    private final UserRepository userRepository;
+
+    public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository){
         this.expenseRepository = expenseRepository;
+        this.userRepository = userRepository;
     }
 
     public List<ExpenseResponseDto> getAllExpenses(){
@@ -49,8 +56,22 @@ public class ExpenseService {
         );
     }
 
-    public ExpenseEntity createExpense(ExpenseEntity expense){
-        return expenseRepository.save(expense);
+    public ExpenseResponseDto createExpense(ExpenseRequestDto expenseRequestDto){
+        UserEntity userEntity = userRepository.findById(expenseRequestDto.userId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + expenseRequestDto.userId() + " não encontrado."));
+
+        ExpenseEntity expenseEntity = new ExpenseEntity(expenseRequestDto.name(), expenseRequestDto.category(), expenseRequestDto.price(),userEntity);
+
+        expenseRepository.save(expenseEntity);
+
+        return new ExpenseResponseDto(
+                expenseEntity.getExpenseId(),
+                expenseEntity.getName(),
+                expenseEntity.getCategory(),
+                expenseEntity.getPrice(),
+                expenseEntity.getDate(),
+                userEntity.getName()
+        );
     }
 
     public void deleteExpenseById(Long id){
