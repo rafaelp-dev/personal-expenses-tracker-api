@@ -49,10 +49,10 @@ public class ExpenseController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseEntity expense){
-        ExpenseEntity expenseEntity = expenseService.updateExpense(id, expense);
+    public ResponseEntity<ExpenseResponseDto> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseRequestDto expenseRequestDto){
+        ExpenseResponseDto expenseResponseDto = expenseService.updateExpense(id, expenseRequestDto);
 
-        return ResponseEntity.ok().body(expenseEntity);
+        return ResponseEntity.ok().body(expenseResponseDto);
     }
 
     @GetMapping("/users/{id}")

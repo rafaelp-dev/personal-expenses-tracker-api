@@ -82,16 +82,29 @@ public class ExpenseService {
         expenseRepository.deleteById(id);
     }
 
-    public ExpenseEntity updateExpense(Long id, ExpenseEntity expenseDetails){
-        ExpenseEntity expense = expenseRepository.findById(id)
+    public ExpenseResponseDto updateExpense(Long id, ExpenseRequestDto expenseRequestDto){
+        ExpenseEntity expenseEntity = expenseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gasto com ID: " + id + " não encontrado."));
 
-        if (expense.getName() != null) expense.setName(expenseDetails.getName());
-        if (expense.getCategory() != null) expense.setCategory(expenseDetails.getCategory());
-        if (expense.getPrice() != null) expense.setPrice(expenseDetails.getPrice());
-        if (expense.getUser() != null) expense.setUser(expenseDetails.getUser());
+        if (expenseRequestDto.name() != null) expenseEntity.setName(expenseRequestDto.name());
+        if (expenseRequestDto.category() != null) expenseEntity.setCategory(expenseRequestDto.category());
+        if (expenseRequestDto.price() != null) expenseEntity.setPrice(expenseRequestDto.price());
+        if (expenseRequestDto.userId() != null) {
+            UserEntity userEntity = userRepository.findById(expenseRequestDto.userId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + expenseRequestDto.userId() + " não encontrado."));
+            expenseEntity.setUser(userEntity);
+        }
 
-        return expenseRepository.save(expense);
+        ExpenseEntity expenseUpdated = expenseRepository.save(expenseEntity);
+
+        return new ExpenseResponseDto(
+                expenseUpdated.getExpenseId(),
+                expenseUpdated.getName(),
+                expenseUpdated.getCategory(),
+                expenseUpdated.getPrice(),
+                expenseUpdated.getDate(),
+                expenseUpdated.getUser().getName()
+        );
     }
 
     public List<ExpenseEntity> findByUserId(Long id){
