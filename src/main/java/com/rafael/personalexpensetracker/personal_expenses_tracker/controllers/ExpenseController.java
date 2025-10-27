@@ -48,7 +48,7 @@ public class ExpenseController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ExpenseResponseDto> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseRequestDto expenseRequestDto){
+    public ResponseEntity<ExpenseResponseDto> updateExpense(@PathVariable Long id, @RequestBody ExpenseRequestDto expenseRequestDto){
         ExpenseResponseDto expenseResponseDto = expenseService.updateExpense(id, expenseRequestDto);
 
         return ResponseEntity.ok().body(expenseResponseDto);

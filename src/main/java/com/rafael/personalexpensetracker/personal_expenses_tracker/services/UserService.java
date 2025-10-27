@@ -46,7 +46,7 @@ public class UserService {
         UserEntity verifyEmail = userRepository.findByEmail(userRequestDto.email());
 
         if (verifyEmail != null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com email: " + userRequestDto.email() + " já existe.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Usuário com email: " + userRequestDto.email() + " já existe.");
         }
 
         UserEntity userEntity = new UserEntity(
