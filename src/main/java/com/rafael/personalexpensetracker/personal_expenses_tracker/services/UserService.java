@@ -21,10 +21,6 @@ public class UserService {
     public List<UserResponseDto> getAllUsers(){
         List<UserEntity> userEntityList = userRepository.findAll();
 
-        if (userEntityList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.OK);
-        }
-
         return userEntityList
                 .stream()
                 .map(user -> new UserResponseDto(
@@ -53,7 +49,8 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com email: " + userRequestDto.email() + " já existe.");
         }
 
-        UserEntity userEntity = new UserEntity(userRequestDto.name(),
+        UserEntity userEntity = new UserEntity(
+                userRequestDto.name(),
                 userRequestDto.email()
         );
 
@@ -67,10 +64,11 @@ public class UserService {
     }
 
     public void deleteUserById(Long id){
-        UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado."));
+        if (!userRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID: " + id + " não encontrado.");
+        }
 
-        userRepository.delete(userEntity);
+        userRepository.existsById(id);
     }
 
     public UserResponseDto updateUser(Long id, UserRequestDto userRequestDto){

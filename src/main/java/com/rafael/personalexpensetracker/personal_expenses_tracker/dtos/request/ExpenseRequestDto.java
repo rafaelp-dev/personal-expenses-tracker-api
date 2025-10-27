@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import java.math.BigDecimal;
+
 public record ExpenseRequestDto(
         @NotBlank(message = "O nome do gasto não pode estar vazio.")
         String name,
@@ -13,7 +15,7 @@ public record ExpenseRequestDto(
 
         @NotNull(message = "O preço do gasto não pode estar vazio.")
         @Positive(message = "O preço do gasto deve ser maior do que 0.")
-        Integer price,
+        BigDecimal price,
 
         @NotNull(message = "O ID de usuário não pode estar vazio.")
         Long userId

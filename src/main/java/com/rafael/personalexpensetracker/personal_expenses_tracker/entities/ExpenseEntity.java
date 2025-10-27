@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class ExpenseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long expenseId;
 
     @NotBlank(message = "O nome do gasto não pode estar vazio.")
@@ -30,7 +31,7 @@ public class ExpenseEntity {
     @NotNull(message = "O preço do gasto não pode estar vazio.")
     @Positive(message = "O preço do gasto deve ser maior do que 0.")
     @Column(nullable = false)
-    private Integer price;
+    private BigDecimal price;
 
     private LocalDateTime date;
 
@@ -42,7 +43,7 @@ public class ExpenseEntity {
         this.date = LocalDateTime.now();
     }
 
-    public ExpenseEntity(String name, String category, Integer price, UserEntity user) {
+    public ExpenseEntity(String name, String category, BigDecimal price, UserEntity user) {
         this.name = name;
         this.category = category;
         this.price = price;
