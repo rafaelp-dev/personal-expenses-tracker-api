@@ -53,11 +53,4 @@ public class ExpenseController {
 
         return ResponseEntity.ok().body(expenseResponseDto);
     }
-
-    @GetMapping("/users/{id}")
-    public ResponseEntity<List<ExpenseResponseDto>> findExpensesByUserId(@PathVariable Long id){
-        List<ExpenseResponseDto> expenseResponseDtos = expenseService.findByUserId(id);
-
-        return ResponseEntity.ok().body(expenseResponseDtos);
-    }
 }

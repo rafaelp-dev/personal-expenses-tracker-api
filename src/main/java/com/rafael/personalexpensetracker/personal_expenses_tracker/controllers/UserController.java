@@ -1,6 +1,8 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.UserRequestDto;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.ExpenseResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.UserResponseDto;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.services.ExpenseService;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -14,8 +16,11 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    public UserController(UserService userService){
+    private final ExpenseService expenseService;
+
+    public UserController(UserService userService, ExpenseService expenseService){
         this.userService = userService;
+        this.expenseService = expenseService;
     }
 
     @GetMapping
@@ -51,5 +56,12 @@ public class UserController {
         UserResponseDto userResponseDto = userService.updateUser(id, userRequestDto);
 
         return ResponseEntity.ok().body(userResponseDto);
+    }
+
+    @GetMapping("/{id}/expenses")
+    public ResponseEntity<List<ExpenseResponseDto>> getUserExpenses(@PathVariable long id){
+        List<ExpenseResponseDto> expenseResponseDtos = expenseService.findByUserId(id);
+
+        return ResponseEntity.ok().body(expenseResponseDtos);
     }
 }
