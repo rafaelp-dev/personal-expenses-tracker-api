@@ -1,151 +1,108 @@
-# Personal Expenses Tracker API
-
-API REST para controlar gastos pessoais.
-
-## Sumário
-- Arquitetura
-- Tecnologias
-- Modelo de dados
-- Funcionalidades / Endpoints
-- Validações e regras de negócio
-- Configuração e execução
-- Exemplos de requisições
-- Possíveis melhorias
+# Personal Expenses Tracker
+API REST em Spring Boot para controlar e analisar seus gastos pessoais com filtros e relatórios inteligentes.
 
 ## Arquitetura
-Aplicação estruturada em camadas:
-
-- Controller - Endpoints: mapeamento REST e validação inicial.
-- Service - Regras de negócio: lógica principal da aplicação.
-- Repository - Persistência: interface JPA para acesso ao banco.
-- Entity - Entidades: modelos de dados mapeados para tabelas.
-- DTOs - Objetos de transferência de dados: para requests e responses.
-
-A aplicação usa Spring Boot como framework principal e JPA/Hibernate para persistência em PostgreSQL.
+A aplicação segue uma arquitetura em camadas clássica do Spring Boot:
+- **Controller** - Endpoints: mapeamento REST e validação inicial dos dados (`@Valid`).
+- **Service** - Regras de negócio: lógica principal da aplicação, processamento de dados e chamadas ao repositório.
+- **Repository** - Acesso a dados: interface com o banco de dados utilizando Spring Data JPA.
+- **DTOs** - Transferência de dados: objetos para entrada (Request) e saída (Response) de dados da API.
+- **Model/Entity** - Mapeamento Objeto-Relacional (ORM): representação das tabelas do banco de dados.
 
 ## Tecnologias
-- Java 21
-- Spring Boot 3.5.4
-  - spring-boot-starter-web
-  - spring-boot-starter-data-jpa
-  - spring-boot-starter-validation
-  - spring-boot-starter-data-jpa
-- PostgreSQL
-- Maven
-- Lombok
-
-## Modelo de dados
-- User
-  - userId: Long (PK)
-  - name: String
-  - email: String (único)
-
-- Expense
-  - expenseId: Long (PK)
-  - name: String
-  - category: String
-  - price: BigDecimal
-  - date: LocalDateTime (inserido automaticamente)
-  - user (ManyToOne -> UserEntity)
+- **Java 21**
+- **Spring Boot 3.5.4**
+- **Spring Data JPA**
+- **Spring Web**
+- **Spring Validation**
+- **PostgreSQL**
+- **Lombok**
+- **Maven**
 
 ## Funcionalidades / Endpoints
-Base path para usuários: `/users`
-- GET /users
-  - Retorna lista de usuários.
-- GET /users/{id}
-  - Retorna usuário por ID.
-- POST /users
-  - Cria um novo usuário.
-- DELETE /users/{id}
-  - Remove usuário por ID.
-- PATCH /users/{id}
-  - Atualiza campos opcionais.
-- GET /users/{id}/expenses
-  - Lista todos os gastos associados a um usuário.
 
-Base path para gastos: `/expenses`
-- GET /expenses
-  - Retorna lista de gastos.
-- GET /expenses/{id}
-  - Retorna gasto por ID.
-- POST /expenses
-  - Cria um gasto.
-- DELETE /expenses/{id}
-  - Remove gasto por ID.
-- PATCH /expenses/{id}
-  - Atualiza campos opcionais do gasto.
+### Usuários (`/users`)
+- `GET /users` - Lista todos os usuários cadastrados.
+- `GET /users/{id}` - Busca um usuário específico pelo ID.
+- `POST /users` - Cadastra um novo usuário.
+- `DELETE /users/{id}` - Remove um usuário pelo ID.
+- `PATCH /users/{id}` - Atualiza os dados de um usuário pelo ID.
+- `GET /users/{id}/expenses` - Lista todos os gastos de um usuário específico.
 
-## Validações e regras de negócio importantes
-- Validações de request via Jakarta Validation (anotações como `@NotBlank`, `@NotNull`, `@Positive`).
-- Ao criar usuário, a aplicação verifica se o email já existe e retorna HTTP 409 CONFLICT em caso afirmativo.
-- Ao criar/atualizar gasto, o `userId` informado deve existir; caso contrário, retorna HTTP 404.
-- Formato de data é `LocalDateTime` (campo `date` preenchido automaticamente no servidor na criação).
+### Gastos (`/expenses`)
+- `GET /expenses` - Lista todos os gastos registrados.
+- `GET /expenses/{id}` - Busca um gasto específico pelo ID.
+- `POST /expenses` - Cadastra um novo gasto (requer um usuário existente).
+- `DELETE /expenses/{id}` - Remove um gasto pelo ID.
+- `PATCH /expenses/{id}` - Atualiza os dados de um gasto pelo ID.
 
 ## Configuração
-As propriedades do projeto estão em `src/main/resources/application.properties`.
+Antes de executar o projeto, é necessário configurar o banco de dados PostgreSQL.
+As configurações estão no arquivo `src/main/resources/application.properties`:
 
-spring.datasource.url=SUA_URL_AQUI
-spring.datasource.username=SEU_USUARIO_AQUI
-spring.datasource.password=SUA_SENHA_AQUI
-
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/personal-expenses-tracker
+spring.datasource.username=postgres
+spring.datasource.password=senhapost
 spring.jpa.hibernate.ddl-auto=update
-
-server.error.include-stacktrace=never
-
-Atenção: troque `spring.datasource.password` e outros dados conforme seu ambiente local. Para produção, prefira variáveis de ambiente.
-
-## Como executar
-Pré-requisitos:
-- JDK 21 instalado
-- PostgreSQL disponível e um banco criado (ex.: `personal-expenses-tracker`)
-
-Executar com Maven wrapper:
-
-```bash
-./mvnw spring-boot:run
 ```
 
+## Como executar
+1. Clone o repositório.
+2. Navegue até a pasta do projeto.
+3. Execute o comando Maven:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+   Ou, se tiver o Maven instalado:
+   ```bash
+   mvn spring-boot:run
+   ```
+4. A aplicação estará disponível em `http://localhost:8080`.
+
 ## Exemplos de requisições
-Criar usuário (POST /users)
 
-Request JSON:
+### Criar usuário
+**POST** `/users`
+```json
 {
-  "name": "nome",
-  "email": "nome@example.com"
+  "name": "Rafael",
+  "email": "rafael@email.com"
 }
+```
 
-Resposta (201 Created): exemplo de `UserResponseDto`:
-{
-  "id": 1,
-  "name": "nome",
-  "email": "nome@example.com"
-}
-
-Criar gasto (POST /expenses)
-
-Request JSON:
+### Criar gasto
+**POST** `/expenses`
+```json
 {
   "name": "Almoço",
   "category": "Alimentação",
-  "price": 25.50,
+  "price": 45.50,
   "userId": 1
 }
+```
 
-Resposta (201 Created): exemplo de `ExpenseResponseDto`:
+### Response (Exemplo)
+```json
 {
-  "expenseId": 1,
+  "id": 1,
   "name": "Almoço",
   "category": "Alimentação",
-  "price": 25.50,
-  "date": "2026-01-20T12:34:56",
-  "userName": "Rafael"
+  "price": 45.50,
+  "user": {
+      "id": 1,
+      "name": "Rafael"
+  }
 }
+```
 
 ## Observações e melhorias futuras
-- Adicionar autenticação/autorização JWT para proteger endpoints.
-- Implementar paginação e filtros nos endpoints de listagem (ex.: por data, categoria, intervalo de preços).
-- Adicionar migrações de banco (Flyway ou Liquibase).
-- Adicionar métricas/monitoramento e documentação automática da API (Swagger/OpenAPI).
+- Implementar paginação nas listagens de usuários e gastos.
+- Adicionar autenticação e segurança (Spring Security).
+- Criar relatórios de gastos por período (mensal/semanal).
+- Adicionar testes unitários e de integração.
+- Documentar a API com Swagger/OpenAPI.
 
 ## Licença e contato
-Projeto pessoal — Para dúvidas ou contribuições, abra uma issue ou entre em contato com o autor do repositório.
+Este projeto é para fins educacionais.
+Desenvolvido por Rafael.
