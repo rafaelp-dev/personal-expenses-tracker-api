@@ -222,12 +222,13 @@ início antes de salvá-la como `DATABASE_URL`. Não remova os parâmetros de SS
 Configuração do serviço no Render:
 
 ```text
-Build Command:  ./mvnw clean package -DskipTests
-Start Command:  java -jar target/personal-expenses-tracker-0.0.1-SNAPSHOT.jar
+Language/Runtime: Docker
+Dockerfile Path:  ./Dockerfile
 ```
 
-O Render fornece a variável `PORT` automaticamente e a API a utiliza sem exigir
-configuração adicional.
+O Render encontra o `Dockerfile`, constrói a imagem e inicia a aplicação pelo
+`ENTRYPOINT`. Não é necessário preencher Build Command ou Start Command. O Render
+fornece a variável `PORT` automaticamente e a API a utiliza sem configuração adicional.
 
 ## Testes
 
