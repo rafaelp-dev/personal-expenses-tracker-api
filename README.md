@@ -196,6 +196,39 @@ Registrar uma saída da caixinha:
 }
 ```
 
+## Deploy no Render com Neon
+
+Cadastre estas variáveis de ambiente no Web Service do Render:
+
+| Variável | Valor |
+| --- | --- |
+| `DATABASE_URL` | URL JDBC do Neon, iniciando com `jdbc:postgresql://` e contendo `sslmode=require` |
+| `DATABASE_USERNAME` | Usuário do banco no Neon |
+| `DATABASE_PASSWORD` | Senha do banco no Neon |
+| `APP_AUTH_JWT_SECRET` | Segredo aleatório com no mínimo 32 caracteres |
+| `CORS_ALLOWED_ORIGINS` | URL pública do front-end, por exemplo `https://expenses-frontend.onrender.com` |
+
+Variáveis opcionais:
+
+| Variável | Padrão | Finalidade |
+| --- | --- | --- |
+| `APP_AUTH_JWT_EXPIRATION_SECONDS` | `3600` | Duração do token JWT |
+| `JPA_DDL_AUTO` | `update` | Estratégia de atualização do schema |
+| `DATABASE_MAX_POOL_SIZE` | `5` | Máximo de conexões no pool |
+
+Se o Neon fornecer uma URL iniciada por `postgresql://`, acrescente `jdbc:` no
+início antes de salvá-la como `DATABASE_URL`. Não remova os parâmetros de SSL.
+
+Configuração do serviço no Render:
+
+```text
+Build Command:  ./mvnw clean package -DskipTests
+Start Command:  java -jar target/personal-expenses-tracker-0.0.1-SNAPSHOT.jar
+```
+
+O Render fornece a variável `PORT` automaticamente e a API a utiliza sem exigir
+configuração adicional.
+
 ## Testes
 
 ```powershell
