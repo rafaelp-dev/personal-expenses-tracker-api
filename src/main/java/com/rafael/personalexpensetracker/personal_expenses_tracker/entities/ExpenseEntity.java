@@ -44,7 +44,7 @@ public class ExpenseEntity {
     private UserEntity user;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "varchar(20) default 'MAIN'")
+    @Column(nullable = false, length = 20)
     private BalanceSource source = BalanceSource.MAIN;
 
     @ManyToOne
