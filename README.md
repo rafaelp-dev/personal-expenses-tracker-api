@@ -1,111 +1,122 @@
-# Personal Expenses Tracker
+# Personal Expenses Tracker API
 
-API REST em Spring Boot para controlar gastos pessoais.
+API REST para gerenciamento de finanças pessoais, desenvolvida com Java e Spring Boot. A aplicação permite organizar receitas, despesas, categorias e reservas financeiras, oferecendo uma visão consolidada do saldo de cada usuário.
+
+## Funcionalidades
+
+- Cadastro e autenticação de usuários
+- Autenticação stateless com JSON Web Token (JWT)
+- Registro, consulta, atualização e exclusão de despesas
+- Registro e consulta de receitas
+- Criação de categorias para receitas e despesas
+- Controle de saldo principal
+- Criação de caixinhas com saldo independente
+- Movimentações financeiras no saldo principal ou em caixinhas
+- Consulta do histórico financeiro por usuário
+- Cálculo do saldo principal, saldo das caixinhas e saldo total
+- Validação dos dados recebidos pela API
+- Controle de acesso aos endpoints protegidos
 
 ## Tecnologias
 
 - Java 21
 - Spring Boot 3.5.4
+- Spring Web
 - Spring Data JPA
-- Spring Security com JWT
+- Spring Security
+- OAuth2 Resource Server
+- JWT com algoritmo HS256
 - PostgreSQL
+- H2 Database para testes
 - Maven
+- Lombok
+- Docker
+
+## Arquitetura
+
+O projeto segue uma arquitetura em camadas para separar responsabilidades e facilitar a manutenção:
+
+```text
+controllers  → exposição dos endpoints REST
+services     → regras de negócio
+repositories → acesso e persistência dos dados
+entities     → mapeamento das entidades do banco
+dtos         → objetos de entrada e saída da API
+config       → segurança, autenticação e CORS
+```
+
+## Principais regras de negócio
+
+- As categorias são classificadas como `INCOME` ou `EXPENSE`.
+- Receitas podem ser destinadas ao saldo principal ou a uma caixinha.
+- Despesas podem utilizar o saldo principal ou o saldo de uma caixinha.
+- Movimentações em caixinhas devem informar o identificador da caixinha.
+- Categorias que já estão em uso não podem ser excluídas.
+- As senhas são armazenadas de forma segura por meio de um `PasswordEncoder`.
+- Apenas cadastro e login são públicos; os demais recursos exigem um token válido.
 
 ## Endpoints
 
 ### Autenticação
 
-- `POST /auth/register` — cria uma conta de acesso.
-- `POST /auth/login` — autentica e devolve um access token JWT.
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `POST` | `/auth/register` | Cadastra uma conta |
+| `POST` | `/auth/login` | Autentica o usuário e retorna um JWT |
 
 ### Usuários
 
-- `GET /users`
-- `GET /users/{id}`
-- `POST /users`
-- `PATCH /users/{id}`
-- `DELETE /users/{id}`
-- `GET /users/{id}/expenses`
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `GET` | `/users` | Lista os usuários |
+| `GET` | `/users/{id}` | Consulta um usuário |
+| `POST` | `/users` | Cria um usuário |
+| `PATCH` | `/users/{id}` | Atualiza um usuário |
+| `DELETE` | `/users/{id}` | Exclui um usuário |
+| `GET` | `/users/{id}/expenses` | Lista as despesas do usuário |
+| `GET` | `/users/{id}/incomes` | Lista as receitas do usuário |
+| `GET` | `/users/{id}/savings-boxes` | Lista as caixinhas do usuário |
+| `GET` | `/users/{id}/balance` | Retorna os saldos do usuário |
 
-### Gastos
+### Despesas
 
-- `GET /expenses`
-- `GET /expenses/{id}`
-- `POST /expenses`
-- `PATCH /expenses/{id}`
-- `DELETE /expenses/{id}`
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `GET` | `/expenses` | Lista as despesas |
+| `GET` | `/expenses/{id}` | Consulta uma despesa |
+| `POST` | `/expenses` | Registra uma despesa |
+| `PATCH` | `/expenses/{id}` | Atualiza uma despesa |
+| `DELETE` | `/expenses/{id}` | Exclui uma despesa |
 
-Ao criar um gasto, informe `source` como `MAIN` para usar o saldo principal ou `SAVINGS_BOX` com `savingsBoxId` para usar uma caixinha.
+### Receitas, categorias e caixinhas
 
-### Categorias
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `POST` | `/incomes` | Registra uma receita |
+| `POST` | `/categories` | Cria uma categoria |
+| `GET` | `/categories/user/{userId}` | Lista as categorias do usuário |
+| `GET` | `/categories/user/{userId}?type=EXPENSE` | Filtra as categorias por tipo |
+| `DELETE` | `/categories/{id}` | Exclui uma categoria que não esteja em uso |
+| `POST` | `/savings-boxes` | Cria uma caixinha |
 
-- `POST /categories` — cria uma categoria de gasto (`EXPENSE`) ou entrada (`INCOME`).
-- `GET /categories/user/{userId}` — lista as categorias do usuário.
-- `GET /categories/user/{userId}?type=EXPENSE` — filtra as categorias pelo tipo.
-- `DELETE /categories/{id}` — exclui uma categoria que ainda não esteja em uso.
+## Autenticação
+
+Após o login, a API retorna um access token que deve ser enviado nos endpoints protegidos:
+
+```http
+Authorization: Bearer SEU_TOKEN
+```
+
+Exemplo de login:
 
 ```json
 {
-  "name": "Alimentação",
-  "type": "EXPENSE",
-  "userId": 1
+  "email": "rafael@email.com",
+  "password": "uma-senha-forte"
 }
 ```
 
-### Receitas e saldos
-
-- `POST /incomes` — registra uma receita no saldo principal ou em uma caixinha.
-- `GET /users/{id}/incomes` — lista o histórico de receitas do usuário.
-- `GET /users/{id}/balance` — retorna saldo principal, total das caixinhas e saldo total.
-
-### Caixinhas
-
-- `POST /savings-boxes` — cria uma caixinha com saldo inicial.
-- `GET /users/{id}/savings-boxes` — lista as caixinhas e seus saldos.
-
-## Configuração
-
-Configure o PostgreSQL em `src/main/resources/application.properties` e defina o segredo JWT por variável de ambiente.
-
-No PowerShell:
-
-```powershell
-$env:APP_AUTH_JWT_SECRET="um-segredo-com-pelo-menos-32-caracteres"
-```
-
-O token dura 3.600 segundos por padrão. Para alterar:
-
-```powershell
-$env:APP_AUTH_JWT_EXPIRATION_SECONDS="7200"
-```
-
-## Como executar
-
-```powershell
-.\mvnw.cmd spring-boot:run
-```
-
-A aplicação ficará disponível em `http://localhost:8080`.
-
-## Autenticação JWT
-
-Crie uma conta de acesso:
-
-```bash
-curl -X POST http://localhost:8080/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Seu Nome","email":"voce@email.com","password":"uma-senha-forte"}'
-```
-
-Solicite um token:
-
-```bash
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"voce@email.com","password":"uma-senha-forte"}'
-```
-
-Resposta:
+Exemplo de resposta:
 
 ```json
 {
@@ -115,28 +126,9 @@ Resposta:
 }
 ```
 
-Use o token nos demais endpoints:
-
-```bash
-curl http://localhost:8080/users \
-  -H "Authorization: Bearer SEU_TOKEN"
-```
-
-Não há refresh token. Quando o JWT expirar, faça login novamente.
-
 ## Exemplos
 
-Criar usuário:
-
-```json
-{
-  "name": "Rafael",
-  "email": "rafael@email.com",
-  "password": "uma-senha-forte"
-}
-```
-
-Criar gasto:
+### Registrar uma despesa
 
 ```json
 {
@@ -148,7 +140,7 @@ Criar gasto:
 }
 ```
 
-Adicionar salário ao saldo principal:
+### Registrar uma receita
 
 ```json
 {
@@ -160,7 +152,7 @@ Adicionar salário ao saldo principal:
 }
 ```
 
-Criar uma caixinha:
+### Criar uma caixinha
 
 ```json
 {
@@ -170,68 +162,23 @@ Criar uma caixinha:
 }
 ```
 
-Adicionar receita a uma caixinha:
+Para movimentar uma caixinha, utilize `SAVINGS_BOX` como origem ou destino e informe também `savingsBoxId`.
 
-```json
-{
-  "description": "Valor extra",
-  "amount": 200.00,
-  "categoryId": 2,
-  "userId": 1,
-  "destination": "SAVINGS_BOX",
-  "savingsBoxId": 1
-}
-```
+## Como executar
 
-Registrar uma saída da caixinha:
-
-```json
-{
-  "name": "Passagem",
-  "categoryId": 3,
-  "price": 250.00,
-  "userId": 1,
-  "source": "SAVINGS_BOX",
-  "savingsBoxId": 1
-}
-```
-
-## Deploy no Render com Neon
-
-Cadastre estas variáveis de ambiente no Web Service do Render:
-
-| Variável | Valor |
-| --- | --- |
-| `DATABASE_URL` | URL JDBC do Neon, iniciando com `jdbc:postgresql://` e contendo `sslmode=require` |
-| `DATABASE_USERNAME` | Usuário do banco no Neon |
-| `DATABASE_PASSWORD` | Senha do banco no Neon |
-| `APP_AUTH_JWT_SECRET` | Segredo aleatório com no mínimo 32 caracteres |
-| `CORS_ALLOWED_ORIGINS` | URL pública do front-end, por exemplo `https://expenses-frontend.onrender.com` |
-
-Variáveis opcionais:
-
-| Variável | Padrão | Finalidade |
-| --- | --- | --- |
-| `APP_AUTH_JWT_EXPIRATION_SECONDS` | `3600` | Duração do token JWT |
-| `JPA_DDL_AUTO` | `update` | Estratégia de atualização do schema |
-| `DATABASE_MAX_POOL_SIZE` | `5` | Máximo de conexões no pool |
-
-Se o Neon fornecer uma URL iniciada por `postgresql://`, acrescente `jdbc:` no
-início antes de salvá-la como `DATABASE_URL`. Não remova os parâmetros de SSL.
-
-Configuração do serviço no Render:
-
-```text
-Language/Runtime: Docker
-Dockerfile Path:  ./Dockerfile
-```
-
-O Render encontra o `Dockerfile`, constrói a imagem e inicia a aplicação pelo
-`ENTRYPOINT`. Não é necessário preencher Build Command ou Start Command. O Render
-fornece a variável `PORT` automaticamente e a API a utiliza sem configuração adicional.
-
-## Testes
+Configure um banco PostgreSQL e defina as variáveis de ambiente:
 
 ```powershell
-.\mvnw.cmd test
+$env:DATABASE_URL="jdbc:postgresql://localhost:5432/personal-expenses-tracker"
+$env:DATABASE_USERNAME="postgres"
+$env:DATABASE_PASSWORD="sua-senha"
+$env:APP_AUTH_JWT_SECRET="um-segredo-com-pelo-menos-32-caracteres"
 ```
+
+Inicie a aplicação no Windows:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+A API estará disponível em `http://localhost:8080`.
