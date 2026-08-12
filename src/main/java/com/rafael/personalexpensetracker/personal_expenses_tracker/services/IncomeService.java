@@ -3,6 +3,7 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.IncomeRequestDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.IncomeResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.IncomeEntity;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.CategoryType;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.SavingsBoxEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.IncomeRepository;
@@ -19,11 +20,14 @@ public class IncomeService {
     private final IncomeRepository incomeRepository;
     private final UserRepository userRepository;
     private final BalanceService balanceService;
+    private final CategoryService categoryService;
 
-    public IncomeService(IncomeRepository incomeRepository, UserRepository userRepository, BalanceService balanceService) {
+    public IncomeService(IncomeRepository incomeRepository, UserRepository userRepository,
+                         BalanceService balanceService, CategoryService categoryService) {
         this.incomeRepository = incomeRepository;
         this.userRepository = userRepository;
         this.balanceService = balanceService;
+        this.categoryService = categoryService;
     }
 
     @Transactional
@@ -34,8 +38,10 @@ public class IncomeService {
         SavingsBoxEntity box = balanceService.credit(
                 user, request.destination(), request.savingsBoxId(), request.amount()
         );
+        var category = categoryService.findForUserAndType(
+                request.categoryId(), request.userId(), CategoryType.INCOME);
         return toResponse(incomeRepository.save(new IncomeEntity(
-                request.description(), request.amount(), request.destination(), user, box
+                request.description(), request.amount(), category, request.destination(), user, box
         )));
     }
 
@@ -48,8 +54,10 @@ public class IncomeService {
 
     private IncomeResponseDto toResponse(IncomeEntity income) {
         SavingsBoxEntity box = income.getSavingsBox();
+        var category = income.getCategory();
         return new IncomeResponseDto(
-                income.getId(), income.getDescription(), income.getAmount(), income.getDate(),
+                income.getId(), income.getDescription(), category == null ? null : category.getId(),
+                category == null ? null : category.getName(), income.getAmount(), income.getDate(),
                 income.getDestination(), income.getUser().getUserId(),
                 box == null ? null : box.getId(), box == null ? null : box.getName()
         );

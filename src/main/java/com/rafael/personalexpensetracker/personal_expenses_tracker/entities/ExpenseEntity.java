@@ -28,6 +28,10 @@ public class ExpenseEntity {
     @Column(nullable = false)
     private String category;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private CategoryEntity categoryEntity;
+
     @NotNull(message = "O preço do gasto não pode estar vazio.")
     @Positive(message = "O preço do gasto deve ser maior do que 0.")
     @Column(nullable = false)
@@ -51,10 +55,11 @@ public class ExpenseEntity {
         this.date = LocalDateTime.now();
     }
 
-    public ExpenseEntity(String name, String category, BigDecimal price, UserEntity user,
+    public ExpenseEntity(String name, CategoryEntity category, BigDecimal price, UserEntity user,
                          BalanceSource source, SavingsBoxEntity savingsBox) {
         this.name = name;
-        this.category = category;
+        this.category = category.getName();
+        this.categoryEntity = category;
         this.price = price;
         this.date = LocalDateTime.now();
         this.user = user;

@@ -20,6 +20,10 @@ public class IncomeEntity {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private CategoryEntity category;
+
     @Column(nullable = false)
     private LocalDateTime date;
 
@@ -38,10 +42,11 @@ public class IncomeEntity {
     protected IncomeEntity() {
     }
 
-    public IncomeEntity(String description, BigDecimal amount, BalanceSource destination,
+    public IncomeEntity(String description, BigDecimal amount, CategoryEntity category, BalanceSource destination,
                         UserEntity user, SavingsBoxEntity savingsBox) {
         this.description = description;
         this.amount = amount;
+        this.category = category;
         this.destination = destination;
         this.user = user;
         this.savingsBox = savingsBox;

@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 public record IncomeResponseDto(
         Long id,
         String description,
+        Long categoryId,
+        String categoryName,
         BigDecimal amount,
         LocalDateTime date,
         BalanceSource destination,

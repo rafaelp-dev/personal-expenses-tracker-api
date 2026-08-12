@@ -37,6 +37,21 @@ API REST em Spring Boot para controlar gastos pessoais.
 
 Ao criar um gasto, informe `source` como `MAIN` para usar o saldo principal ou `SAVINGS_BOX` com `savingsBoxId` para usar uma caixinha.
 
+### Categorias
+
+- `POST /categories` — cria uma categoria de gasto (`EXPENSE`) ou entrada (`INCOME`).
+- `GET /categories/user/{userId}` — lista as categorias do usuário.
+- `GET /categories/user/{userId}?type=EXPENSE` — filtra as categorias pelo tipo.
+- `DELETE /categories/{id}` — exclui uma categoria que ainda não esteja em uso.
+
+```json
+{
+  "name": "Alimentação",
+  "type": "EXPENSE",
+  "userId": 1
+}
+```
+
 ### Receitas e saldos
 
 - `POST /incomes` — registra uma receita no saldo principal ou em uma caixinha.
@@ -126,7 +141,7 @@ Criar gasto:
 ```json
 {
   "name": "Almoço",
-  "category": "Alimentação",
+  "categoryId": 1,
   "price": 45.50,
   "userId": 1,
   "source": "MAIN"
@@ -139,6 +154,7 @@ Adicionar salário ao saldo principal:
 {
   "description": "Salário",
   "amount": 5000.00,
+  "categoryId": 2,
   "userId": 1,
   "destination": "MAIN"
 }
@@ -160,6 +176,7 @@ Adicionar receita a uma caixinha:
 {
   "description": "Valor extra",
   "amount": 200.00,
+  "categoryId": 2,
   "userId": 1,
   "destination": "SAVINGS_BOX",
   "savingsBoxId": 1
@@ -171,7 +188,7 @@ Registrar uma saída da caixinha:
 ```json
 {
   "name": "Passagem",
-  "category": "Viagem",
+  "categoryId": 3,
   "price": 250.00,
   "userId": 1,
   "source": "SAVINGS_BOX",

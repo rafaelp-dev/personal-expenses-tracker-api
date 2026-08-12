@@ -11,8 +11,8 @@ public record ExpenseRequestDto(
         @NotBlank(message = "O nome do gasto não pode estar vazio.")
         String name,
 
-        @NotBlank(message = "A categoria não pode estar vazia.")
-        String category,
+        @NotNull(message = "O ID da categoria é obrigatório.")
+        Long categoryId,
 
         @NotNull(message = "O preço do gasto não pode estar vazio.")
         @Positive(message = "O preço do gasto deve ser maior do que 0.")

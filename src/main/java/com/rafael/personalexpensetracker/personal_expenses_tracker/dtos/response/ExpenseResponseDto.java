@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 public record ExpenseResponseDto(
         Long expenseId,
         String name,
-        String category,
+        Long categoryId,
+        String categoryName,
         BigDecimal price,
         LocalDateTime date,
         String userName,
