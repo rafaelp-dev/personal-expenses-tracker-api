@@ -172,8 +172,18 @@ Configure um banco PostgreSQL e defina as variáveis de ambiente:
 $env:DATABASE_URL="jdbc:postgresql://localhost:5432/personal-expenses-tracker"
 $env:DATABASE_USERNAME="postgres"
 $env:DATABASE_PASSWORD="sua-senha"
+$env:DATABASE_MAX_POOL_SIZE="5"
+$env:DATABASE_MIN_IDLE="0"
+$env:DATABASE_CONNECTION_TIMEOUT="30000"
+$env:DATABASE_KEEPALIVE_TIME="120000"
+$env:JPA_DDL_AUTO="update"
 $env:APP_AUTH_JWT_SECRET="um-segredo-com-pelo-menos-32-caracteres"
+$env:APP_AUTH_JWT_EXPIRATION_SECONDS="3600"
+$env:CORS_ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
+$env:PORT="8080"
 ```
+
+Todas as variáveis acima são obrigatórias. A aplicação não utiliza valores padrão quando alguma configuração está ausente.
 
 Inicie a aplicação no Windows:
 
