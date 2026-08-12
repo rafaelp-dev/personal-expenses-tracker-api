@@ -33,7 +33,7 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, precision = 19, scale = 2, columnDefinition = "numeric(19,2) default 0")
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
     public UserEntity(){}
