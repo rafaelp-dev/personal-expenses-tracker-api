@@ -15,6 +15,9 @@ public record IncomeRequestDto(
         @Positive(message = "O valor da receita deve ser maior que zero.")
         BigDecimal amount,
 
+        @NotNull(message = "O ID da categoria é obrigatório.")
+        Long categoryId,
+
         @NotNull(message = "O ID do usuário é obrigatório.")
         Long userId,
 

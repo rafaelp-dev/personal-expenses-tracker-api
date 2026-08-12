@@ -3,6 +3,8 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.services;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.ExpenseRequestDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.ExpenseResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.BalanceSource;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.CategoryEntity;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.CategoryType;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.ExpenseEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.SavingsBoxEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
@@ -21,12 +23,14 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final UserRepository userRepository;
     private final BalanceService balanceService;
+    private final CategoryService categoryService;
 
     public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository,
-                          BalanceService balanceService) {
+                          BalanceService balanceService, CategoryService categoryService) {
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
         this.balanceService = balanceService;
+        this.categoryService = categoryService;
     }
 
     public List<ExpenseResponseDto> getAllExpenses() {
@@ -40,11 +44,13 @@ public class ExpenseService {
     @Transactional
     public ExpenseResponseDto createExpense(ExpenseRequestDto request) {
         UserEntity user = findUser(request.userId());
+        CategoryEntity category = categoryService.findForUserAndType(
+                request.categoryId(), request.userId(), CategoryType.EXPENSE);
         BalanceSource source = request.source() == null ? BalanceSource.MAIN : request.source();
         SavingsBoxEntity box = balanceService.debit(user, source, request.savingsBoxId(), request.price());
 
         return toResponse(expenseRepository.save(new ExpenseEntity(
-                request.name(), request.category(), request.price(), user, source, box
+                request.name(), category, request.price(), user, source, box
         )));
     }
 
@@ -68,13 +74,19 @@ public class ExpenseService {
         );
 
         UserEntity user = request.userId() == null ? expense.getUser() : findUser(request.userId());
+        Long categoryId = request.categoryId() == null
+                ? expense.getCategoryEntity().getId()
+                : request.categoryId();
+        CategoryEntity category = categoryService.findForUserAndType(
+                categoryId, user.getUserId(), CategoryType.EXPENSE);
         BigDecimal price = request.price() == null ? expense.getPrice() : request.price();
         BalanceSource source = request.source() == null ? expense.getSource() : request.source();
         Long boxId = resolveBoxId(request, expense, user, source);
         SavingsBoxEntity box = balanceService.debit(user, source, boxId, price);
 
         if (request.name() != null) expense.setName(request.name());
-        if (request.category() != null) expense.setCategory(request.category());
+        expense.setCategoryEntity(category);
+        expense.setCategory(category.getName());
         expense.setPrice(price);
         expense.setUser(user);
         expense.setSource(source);
@@ -111,8 +123,10 @@ public class ExpenseService {
 
     private ExpenseResponseDto toResponse(ExpenseEntity expense) {
         SavingsBoxEntity box = expense.getSavingsBox();
+        CategoryEntity category = expense.getCategoryEntity();
         return new ExpenseResponseDto(
-                expense.getExpenseId(), expense.getName(), expense.getCategory(), expense.getPrice(),
+                expense.getExpenseId(), expense.getName(), category == null ? null : category.getId(),
+                category == null ? expense.getCategory() : category.getName(), expense.getPrice(),
                 expense.getDate(), expense.getUser().getName(), expense.getSource(),
                 box == null ? null : box.getId(), box == null ? null : box.getName()
         );

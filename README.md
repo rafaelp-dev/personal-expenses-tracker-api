@@ -37,6 +37,21 @@ API REST em Spring Boot para controlar gastos pessoais.
 
 Ao criar um gasto, informe `source` como `MAIN` para usar o saldo principal ou `SAVINGS_BOX` com `savingsBoxId` para usar uma caixinha.
 
+### Categorias
+
+- `POST /categories` — cria uma categoria de gasto (`EXPENSE`) ou entrada (`INCOME`).
+- `GET /categories/user/{userId}` — lista as categorias do usuário.
+- `GET /categories/user/{userId}?type=EXPENSE` — filtra as categorias pelo tipo.
+- `DELETE /categories/{id}` — exclui uma categoria que ainda não esteja em uso.
+
+```json
+{
+  "name": "Alimentação",
+  "type": "EXPENSE",
+  "userId": 1
+}
+```
+
 ### Receitas e saldos
 
 - `POST /incomes` — registra uma receita no saldo principal ou em uma caixinha.
@@ -126,7 +141,7 @@ Criar gasto:
 ```json
 {
   "name": "Almoço",
-  "category": "Alimentação",
+  "categoryId": 1,
   "price": 45.50,
   "userId": 1,
   "source": "MAIN"
@@ -139,6 +154,7 @@ Adicionar salário ao saldo principal:
 {
   "description": "Salário",
   "amount": 5000.00,
+  "categoryId": 2,
   "userId": 1,
   "destination": "MAIN"
 }
@@ -160,6 +176,7 @@ Adicionar receita a uma caixinha:
 {
   "description": "Valor extra",
   "amount": 200.00,
+  "categoryId": 2,
   "userId": 1,
   "destination": "SAVINGS_BOX",
   "savingsBoxId": 1
@@ -171,13 +188,47 @@ Registrar uma saída da caixinha:
 ```json
 {
   "name": "Passagem",
-  "category": "Viagem",
+  "categoryId": 3,
   "price": 250.00,
   "userId": 1,
   "source": "SAVINGS_BOX",
   "savingsBoxId": 1
 }
 ```
+
+## Deploy no Render com Neon
+
+Cadastre estas variáveis de ambiente no Web Service do Render:
+
+| Variável | Valor |
+| --- | --- |
+| `DATABASE_URL` | URL JDBC do Neon, iniciando com `jdbc:postgresql://` e contendo `sslmode=require` |
+| `DATABASE_USERNAME` | Usuário do banco no Neon |
+| `DATABASE_PASSWORD` | Senha do banco no Neon |
+| `APP_AUTH_JWT_SECRET` | Segredo aleatório com no mínimo 32 caracteres |
+| `CORS_ALLOWED_ORIGINS` | URL pública do front-end, por exemplo `https://expenses-frontend.onrender.com` |
+
+Variáveis opcionais:
+
+| Variável | Padrão | Finalidade |
+| --- | --- | --- |
+| `APP_AUTH_JWT_EXPIRATION_SECONDS` | `3600` | Duração do token JWT |
+| `JPA_DDL_AUTO` | `update` | Estratégia de atualização do schema |
+| `DATABASE_MAX_POOL_SIZE` | `5` | Máximo de conexões no pool |
+
+Se o Neon fornecer uma URL iniciada por `postgresql://`, acrescente `jdbc:` no
+início antes de salvá-la como `DATABASE_URL`. Não remova os parâmetros de SSL.
+
+Configuração do serviço no Render:
+
+```text
+Language/Runtime: Docker
+Dockerfile Path:  ./Dockerfile
+```
+
+O Render encontra o `Dockerfile`, constrói a imagem e inicia a aplicação pelo
+`ENTRYPOINT`. Não é necessário preencher Build Command ou Start Command. O Render
+fornece a variável `PORT` automaticamente e a API a utiliza sem configuração adicional.
 
 ## Testes
 
