@@ -1,78 +1,115 @@
 # Personal Expenses Tracker
-API REST em Spring Boot para controlar e analisar seus gastos pessoais com filtros e relatórios inteligentes.
 
-## Arquitetura
-A aplicação segue uma arquitetura em camadas clássica do Spring Boot:
-- **Controller** - Endpoints: mapeamento REST e validação inicial dos dados (`@Valid`).
-- **Service** - Regras de negócio: lógica principal da aplicação, processamento de dados e chamadas ao repositório.
-- **Repository** - Acesso a dados: interface com o banco de dados utilizando Spring Data JPA.
-- **DTOs** - Transferência de dados: objetos para entrada (Request) e saída (Response) de dados da API.
-- **Model/Entity** - Mapeamento Objeto-Relacional (ORM): representação das tabelas do banco de dados.
+API REST em Spring Boot para controlar gastos pessoais.
 
 ## Tecnologias
-- **Java 21**
-- **Spring Boot 3.5.4**
-- **Spring Data JPA**
-- **Spring Web**
-- **Spring Validation**
-- **PostgreSQL**
-- **Lombok**
-- **Maven**
 
-## Funcionalidades / Endpoints
+- Java 21
+- Spring Boot 3.5.4
+- Spring Data JPA
+- Spring Security com JWT
+- PostgreSQL
+- Maven
 
-### Usuários (`/users`)
-- `GET /users` - Lista todos os usuários cadastrados.
-- `GET /users/{id}` - Busca um usuário específico pelo ID.
-- `POST /users` - Cadastra um novo usuário.
-- `DELETE /users/{id}` - Remove um usuário pelo ID.
-- `PATCH /users/{id}` - Atualiza os dados de um usuário pelo ID.
-- `GET /users/{id}/expenses` - Lista todos os gastos de um usuário específico.
+## Endpoints
 
-### Gastos (`/expenses`)
-- `GET /expenses` - Lista todos os gastos registrados.
-- `GET /expenses/{id}` - Busca um gasto específico pelo ID.
-- `POST /expenses` - Cadastra um novo gasto (requer um usuário existente).
-- `DELETE /expenses/{id}` - Remove um gasto pelo ID.
-- `PATCH /expenses/{id}` - Atualiza os dados de um gasto pelo ID.
+### Autenticação
+
+- `POST /auth/register` — cria uma conta de acesso.
+- `POST /auth/login` — autentica e devolve um access token JWT.
+
+### Usuários
+
+- `GET /users`
+- `GET /users/{id}`
+- `POST /users`
+- `PATCH /users/{id}`
+- `DELETE /users/{id}`
+- `GET /users/{id}/expenses`
+
+### Gastos
+
+- `GET /expenses`
+- `GET /expenses/{id}`
+- `POST /expenses`
+- `PATCH /expenses/{id}`
+- `DELETE /expenses/{id}`
 
 ## Configuração
-Antes de executar o projeto, é necessário configurar o banco de dados PostgreSQL.
-As configurações estão no arquivo `src/main/resources/application.properties`:
 
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/personal-expenses-tracker
-spring.datasource.username=postgres
-spring.datasource.password=senhapost
-spring.jpa.hibernate.ddl-auto=update
+Configure o PostgreSQL em `src/main/resources/application.properties` e defina o segredo JWT por variável de ambiente.
+
+No PowerShell:
+
+```powershell
+$env:APP_AUTH_JWT_SECRET="um-segredo-com-pelo-menos-32-caracteres"
+```
+
+O token dura 3.600 segundos por padrão. Para alterar:
+
+```powershell
+$env:APP_AUTH_JWT_EXPIRATION_SECONDS="7200"
 ```
 
 ## Como executar
-1. Clone o repositório.
-2. Navegue até a pasta do projeto.
-3. Execute o comando Maven:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-   Ou, se tiver o Maven instalado:
-   ```bash
-   mvn spring-boot:run
-   ```
-4. A aplicação estará disponível em `http://localhost:8080`.
 
-## Exemplos de requisições
+```powershell
+.\mvnw.cmd spring-boot:run
+```
 
-### Criar usuário
-**POST** `/users`
+A aplicação ficará disponível em `http://localhost:8080`.
+
+## Autenticação JWT
+
+Crie uma conta de acesso:
+
+```bash
+curl -X POST http://localhost:8080/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Seu Nome","email":"voce@email.com","password":"uma-senha-forte"}'
+```
+
+Solicite um token:
+
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"voce@email.com","password":"uma-senha-forte"}'
+```
+
+Resposta:
+
 ```json
 {
-  "name": "Rafael",
-  "email": "rafael@email.com"
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+  "tokenType": "Bearer",
+  "expiresIn": 3600
 }
 ```
 
-### Criar gasto
-**POST** `/expenses`
+Use o token nos demais endpoints:
+
+```bash
+curl http://localhost:8080/users \
+  -H "Authorization: Bearer SEU_TOKEN"
+```
+
+Não há refresh token. Quando o JWT expirar, faça login novamente.
+
+## Exemplos
+
+Criar usuário:
+
+```json
+{
+  "name": "Rafael",
+  "email": "rafael@email.com",
+  "password": "uma-senha-forte"
+}
+```
+
+Criar gasto:
+
 ```json
 {
   "name": "Almoço",
@@ -82,27 +119,8 @@ spring.jpa.hibernate.ddl-auto=update
 }
 ```
 
-### Response (Exemplo)
-```json
-{
-  "id": 1,
-  "name": "Almoço",
-  "category": "Alimentação",
-  "price": 45.50,
-  "user": {
-      "id": 1,
-      "name": "Rafael"
-  }
-}
+## Testes
+
+```powershell
+.\mvnw.cmd test
 ```
-
-## Observações e melhorias futuras
-- Implementar paginação nas listagens de usuários e gastos.
-- Adicionar autenticação e segurança (Spring Security).
-- Criar relatórios de gastos por período (mensal/semanal).
-- Adicionar testes unitários e de integração.
-- Documentar a API com Swagger/OpenAPI.
-
-## Licença e contato
-Este projeto é para fins educacionais.
-Desenvolvido por Rafael.

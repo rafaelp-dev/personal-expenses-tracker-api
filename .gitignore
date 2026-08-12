@@ -38,6 +38,9 @@ build/
 ### Environment Variables ###
 .env
 
+### Local project documentation ###
+FUNCIONALIDADES_IMPLEMENTADAS.md
+
 ### System Files ###
 .DS_Store
 Thumbs.db
