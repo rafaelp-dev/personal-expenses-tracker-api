@@ -35,6 +35,19 @@ API REST em Spring Boot para controlar gastos pessoais.
 - `PATCH /expenses/{id}`
 - `DELETE /expenses/{id}`
 
+Ao criar um gasto, informe `source` como `MAIN` para usar o saldo principal ou `SAVINGS_BOX` com `savingsBoxId` para usar uma caixinha.
+
+### Receitas e saldos
+
+- `POST /incomes` — registra uma receita no saldo principal ou em uma caixinha.
+- `GET /users/{id}/incomes` — lista o histórico de receitas do usuário.
+- `GET /users/{id}/balance` — retorna saldo principal, total das caixinhas e saldo total.
+
+### Caixinhas
+
+- `POST /savings-boxes` — cria uma caixinha com saldo inicial.
+- `GET /users/{id}/savings-boxes` — lista as caixinhas e seus saldos.
+
 ## Configuração
 
 Configure o PostgreSQL em `src/main/resources/application.properties` e defina o segredo JWT por variável de ambiente.
@@ -115,7 +128,54 @@ Criar gasto:
   "name": "Almoço",
   "category": "Alimentação",
   "price": 45.50,
-  "userId": 1
+  "userId": 1,
+  "source": "MAIN"
+}
+```
+
+Adicionar salário ao saldo principal:
+
+```json
+{
+  "description": "Salário",
+  "amount": 5000.00,
+  "userId": 1,
+  "destination": "MAIN"
+}
+```
+
+Criar uma caixinha:
+
+```json
+{
+  "name": "Viagem",
+  "userId": 1,
+  "initialBalance": 500.00
+}
+```
+
+Adicionar receita a uma caixinha:
+
+```json
+{
+  "description": "Valor extra",
+  "amount": 200.00,
+  "userId": 1,
+  "destination": "SAVINGS_BOX",
+  "savingsBoxId": 1
+}
+```
+
+Registrar uma saída da caixinha:
+
+```json
+{
+  "name": "Passagem",
+  "category": "Viagem",
+  "price": 250.00,
+  "userId": 1,
+  "source": "SAVINGS_BOX",
+  "savingsBoxId": 1
 }
 ```
 

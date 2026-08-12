@@ -1,5 +1,6 @@
 package com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request;
 
+import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.BalanceSource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -18,6 +19,10 @@ public record ExpenseRequestDto(
         BigDecimal price,
 
         @NotNull(message = "O ID de usuário não pode estar vazio.")
-        Long userId
+        Long userId,
+
+        BalanceSource source,
+
+        Long savingsBoxId
 ) {
 }
