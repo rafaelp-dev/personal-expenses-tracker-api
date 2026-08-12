@@ -2,7 +2,12 @@ package com.rafael.personalexpensetracker.personal_expenses_tracker.controllers;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.request.UserRequestDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.ExpenseResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.UserResponseDto;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.BalanceResponseDto;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.IncomeResponseDto;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response.SavingsBoxResponseDto;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.ExpenseService;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.services.IncomeService;
+import com.rafael.personalexpensetracker.personal_expenses_tracker.services.SavingsBoxService;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,10 +22,15 @@ public class UserController {
     private final UserService userService;
 
     private final ExpenseService expenseService;
+    private final IncomeService incomeService;
+    private final SavingsBoxService savingsBoxService;
 
-    public UserController(UserService userService, ExpenseService expenseService){
+    public UserController(UserService userService, ExpenseService expenseService,
+                          IncomeService incomeService, SavingsBoxService savingsBoxService){
         this.userService = userService;
         this.expenseService = expenseService;
+        this.incomeService = incomeService;
+        this.savingsBoxService = savingsBoxService;
     }
 
     @GetMapping
@@ -63,5 +73,20 @@ public class UserController {
         List<ExpenseResponseDto> expenseResponseDtos = expenseService.findByUserId(id);
 
         return ResponseEntity.ok().body(expenseResponseDtos);
+    }
+
+    @GetMapping("/{id}/incomes")
+    public ResponseEntity<List<IncomeResponseDto>> getUserIncomes(@PathVariable long id) {
+        return ResponseEntity.ok(incomeService.findByUserId(id));
+    }
+
+    @GetMapping("/{id}/savings-boxes")
+    public ResponseEntity<List<SavingsBoxResponseDto>> getUserSavingsBoxes(@PathVariable long id) {
+        return ResponseEntity.ok(savingsBoxService.findByUserId(id));
+    }
+
+    @GetMapping("/{id}/balance")
+    public ResponseEntity<BalanceResponseDto> getUserBalance(@PathVariable long id) {
+        return ResponseEntity.ok(savingsBoxService.getBalance(id));
     }
 }

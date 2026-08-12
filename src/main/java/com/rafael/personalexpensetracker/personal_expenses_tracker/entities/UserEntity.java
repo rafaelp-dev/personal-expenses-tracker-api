@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "users")
@@ -32,12 +33,16 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, precision = 19, scale = 2, columnDefinition = "numeric(19,2) default 0")
+    private BigDecimal balance = BigDecimal.ZERO;
+
     public UserEntity(){}
 
     public UserEntity(String name, String email, String password){
         this.name = name;
         this.email = email;
         this.password = password;
+        this.balance = BigDecimal.ZERO;
     }
 
     @Override

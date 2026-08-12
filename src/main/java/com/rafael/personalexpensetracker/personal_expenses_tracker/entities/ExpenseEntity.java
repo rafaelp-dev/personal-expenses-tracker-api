@@ -39,15 +39,26 @@ public class ExpenseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(20) default 'MAIN'")
+    private BalanceSource source = BalanceSource.MAIN;
+
+    @ManyToOne
+    @JoinColumn(name = "savings_box_id")
+    private SavingsBoxEntity savingsBox;
+
     public ExpenseEntity(){
         this.date = LocalDateTime.now();
     }
 
-    public ExpenseEntity(String name, String category, BigDecimal price, UserEntity user) {
+    public ExpenseEntity(String name, String category, BigDecimal price, UserEntity user,
+                         BalanceSource source, SavingsBoxEntity savingsBox) {
         this.name = name;
         this.category = category;
         this.price = price;
         this.date = LocalDateTime.now();
         this.user = user;
+        this.source = source;
+        this.savingsBox = savingsBox;
     }
 }
