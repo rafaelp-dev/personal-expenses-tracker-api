@@ -9,8 +9,6 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.services.Expe
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.IncomeService;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.SavingsBoxService;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
