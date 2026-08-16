@@ -6,6 +6,7 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.Cate
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,19 +22,19 @@ public class CategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryResponseDto create(@Valid @RequestBody CategoryRequestDto request) {
-        return categoryService.create(request);
+    public CategoryResponseDto create(@Valid @RequestBody CategoryRequestDto request, Authentication authentication) {
+        return categoryService.create(request, authentication.getName());
     }
 
-    @GetMapping("/user/{userId}")
-    public List<CategoryResponseDto> findByUser(@PathVariable Long userId,
-                                                @RequestParam(required = false) CategoryType type) {
-        return categoryService.findByUser(userId, type);
+    @GetMapping
+    public List<CategoryResponseDto> findByUser(@RequestParam(required = false) CategoryType type,
+                                                Authentication authentication) {
+        return categoryService.findByUser(authentication.getName(), type);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        categoryService.delete(id);
+    public void delete(@PathVariable Long id, Authentication authentication) {
+        categoryService.delete(id, authentication.getName());
     }
 }

@@ -9,9 +9,8 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.services.Expe
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.IncomeService;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.SavingsBoxService;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,60 +32,44 @@ public class UserController {
         this.savingsBoxService = savingsBoxService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponseDto>> getAllUsers(){
-        List<UserResponseDto> userResponseDtos = userService.getAllUsers();
-
-        return ResponseEntity.ok().body(userResponseDtos);
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> getAuthenticatedUser(Authentication authentication){
+        return ResponseEntity.ok(userService.getAuthenticatedUser(authentication.getName()));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id){
-        UserResponseDto userResponseDto = userService.getUserById(id);
-
-        return ResponseEntity.ok().body(userResponseDto);
-    }
-
-    @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto){
-        UserResponseDto userResponseDto = userService.createUser(userRequestDto);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
-        userService.deleteUserById(id);
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteUser(Authentication authentication){
+        userService.deleteAuthenticatedUser(authentication.getName());
 
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {
-        UserResponseDto userResponseDto = userService.updateUser(id, userRequestDto);
+    @PatchMapping("/me")
+    public ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRequestDto userRequestDto, Authentication authentication) {
+        UserResponseDto userResponseDto = userService.updateAuthenticatedUser(authentication.getName(), userRequestDto);
 
         return ResponseEntity.ok().body(userResponseDto);
     }
 
-    @GetMapping("/{id}/expenses")
-    public ResponseEntity<List<ExpenseResponseDto>> getUserExpenses(@PathVariable long id){
-        List<ExpenseResponseDto> expenseResponseDtos = expenseService.findByUserId(id);
+    @GetMapping("/me/expenses")
+    public ResponseEntity<List<ExpenseResponseDto>> getUserExpenses(Authentication authentication){
+        List<ExpenseResponseDto> expenseResponseDtos = expenseService.getAllExpenses(authentication.getName());
 
         return ResponseEntity.ok().body(expenseResponseDtos);
     }
 
-    @GetMapping("/{id}/incomes")
-    public ResponseEntity<List<IncomeResponseDto>> getUserIncomes(@PathVariable long id) {
-        return ResponseEntity.ok(incomeService.findByUserId(id));
+    @GetMapping("/me/incomes")
+    public ResponseEntity<List<IncomeResponseDto>> getUserIncomes(Authentication authentication) {
+        return ResponseEntity.ok(incomeService.findByUser(authentication.getName()));
     }
 
-    @GetMapping("/{id}/savings-boxes")
-    public ResponseEntity<List<SavingsBoxResponseDto>> getUserSavingsBoxes(@PathVariable long id) {
-        return ResponseEntity.ok(savingsBoxService.findByUserId(id));
+    @GetMapping("/me/savings-boxes")
+    public ResponseEntity<List<SavingsBoxResponseDto>> getUserSavingsBoxes(Authentication authentication) {
+        return ResponseEntity.ok(savingsBoxService.findByUser(authentication.getName()));
     }
 
-    @GetMapping("/{id}/balance")
-    public ResponseEntity<BalanceResponseDto> getUserBalance(@PathVariable long id) {
-        return ResponseEntity.ok(savingsBoxService.getBalance(id));
+    @GetMapping("/me/balance")
+    public ResponseEntity<BalanceResponseDto> getUserBalance(Authentication authentication) {
+        return ResponseEntity.ok(savingsBoxService.getBalance(authentication.getName()));
     }
 }

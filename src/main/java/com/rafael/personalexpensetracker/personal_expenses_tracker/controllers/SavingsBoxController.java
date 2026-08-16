@@ -5,6 +5,7 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.SavingsBoxService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +19,7 @@ public class SavingsBoxController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SavingsBoxResponseDto create(@Valid @RequestBody SavingsBoxRequestDto request) {
-        return savingsBoxService.create(request);
+    public SavingsBoxResponseDto create(@Valid @RequestBody SavingsBoxRequestDto request, Authentication authentication) {
+        return savingsBoxService.create(request, authentication.getName());
     }
 }

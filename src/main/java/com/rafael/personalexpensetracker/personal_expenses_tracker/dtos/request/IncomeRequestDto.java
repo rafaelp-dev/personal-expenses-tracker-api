@@ -18,9 +18,6 @@ public record IncomeRequestDto(
         @NotNull(message = "O ID da categoria é obrigatório.")
         Long categoryId,
 
-        @NotNull(message = "O ID do usuário é obrigatório.")
-        Long userId,
-
         @NotNull(message = "O destino da receita é obrigatório.")
         BalanceSource destination,
 

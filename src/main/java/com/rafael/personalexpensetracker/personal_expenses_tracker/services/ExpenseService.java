@@ -9,7 +9,6 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.Expe
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.SavingsBoxEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.ExpenseRepository;
-import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,31 +20,31 @@ import java.util.List;
 @Service
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
-    private final UserRepository userRepository;
+    private final AuthenticatedUserService authenticatedUserService;
     private final BalanceService balanceService;
     private final CategoryService categoryService;
 
-    public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository,
+    public ExpenseService(ExpenseRepository expenseRepository, AuthenticatedUserService authenticatedUserService,
                           BalanceService balanceService, CategoryService categoryService) {
         this.expenseRepository = expenseRepository;
-        this.userRepository = userRepository;
+        this.authenticatedUserService = authenticatedUserService;
         this.balanceService = balanceService;
         this.categoryService = categoryService;
     }
 
-    public List<ExpenseResponseDto> getAllExpenses() {
-        return expenseRepository.findAll().stream().map(this::toResponse).toList();
+    public List<ExpenseResponseDto> getAllExpenses(String email) {
+        return findByUserId(authenticatedUserService.require(email).getUserId());
     }
 
-    public ExpenseResponseDto getExpenseById(Long id) {
-        return toResponse(findExpense(id));
+    public ExpenseResponseDto getExpenseById(Long id, String email) {
+        return toResponse(findExpense(id, authenticatedUserService.require(email).getUserId()));
     }
 
     @Transactional
-    public ExpenseResponseDto createExpense(ExpenseRequestDto request) {
-        UserEntity user = findUser(request.userId());
+    public ExpenseResponseDto createExpense(ExpenseRequestDto request, String email) {
+        UserEntity user = authenticatedUserService.require(email);
         CategoryEntity category = categoryService.findForUserAndType(
-                request.categoryId(), request.userId(), CategoryType.EXPENSE);
+                request.categoryId(), user.getUserId(), CategoryType.EXPENSE);
         BalanceSource source = request.source() == null ? BalanceSource.MAIN : request.source();
         SavingsBoxEntity box = balanceService.debit(user, source, request.savingsBoxId(), request.price());
 
@@ -55,8 +54,8 @@ public class ExpenseService {
     }
 
     @Transactional
-    public void deleteExpenseById(Long id) {
-        ExpenseEntity expense = findExpense(id);
+    public void deleteExpenseById(Long id, String email) {
+        ExpenseEntity expense = findExpense(id, authenticatedUserService.require(email).getUserId());
         balanceService.credit(
                 expense.getUser(), expense.getSource(),
                 expense.getSavingsBox() == null ? null : expense.getSavingsBox().getId(), expense.getPrice()
@@ -65,15 +64,15 @@ public class ExpenseService {
     }
 
     @Transactional
-    public ExpenseResponseDto updateExpense(Long id, ExpenseRequestDto request) {
-        ExpenseEntity expense = findExpense(id);
+    public ExpenseResponseDto updateExpense(Long id, ExpenseRequestDto request, String email) {
+        UserEntity user = authenticatedUserService.require(email);
+        ExpenseEntity expense = findExpense(id, user.getUserId());
 
         balanceService.credit(
                 expense.getUser(), expense.getSource(),
                 expense.getSavingsBox() == null ? null : expense.getSavingsBox().getId(), expense.getPrice()
         );
 
-        UserEntity user = request.userId() == null ? expense.getUser() : findUser(request.userId());
         Long categoryId = request.categoryId() == null
                 ? expense.getCategoryEntity().getId()
                 : request.categoryId();
@@ -95,7 +94,7 @@ public class ExpenseService {
         return toResponse(expenseRepository.save(expense));
     }
 
-    public List<ExpenseResponseDto> findByUserId(Long id) {
+    private List<ExpenseResponseDto> findByUserId(Long id) {
         return expenseRepository.findByUser_UserId(id).stream().map(this::toResponse).toList();
     }
 
@@ -109,15 +108,9 @@ public class ExpenseService {
         return null;
     }
 
-    private ExpenseEntity findExpense(Long id) {
-        return expenseRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
+    private ExpenseEntity findExpense(Long id, Long userId) {
+        return expenseRepository.findByExpenseIdAndUser_UserId(id, userId).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Gasto com ID " + id + " não encontrado."
-        ));
-    }
-
-    private UserEntity findUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Usuário com ID " + id + " não encontrado."
         ));
     }
 

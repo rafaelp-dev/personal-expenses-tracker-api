@@ -9,6 +9,5 @@ public record CategoryRequestDto(
         @NotBlank(message = "O nome da categoria não pode estar vazio.")
         @Size(max = 80, message = "O nome da categoria deve ter no máximo 80 caracteres.")
         String name,
-        @NotNull(message = "O tipo da categoria é obrigatório.") CategoryType type,
-        @NotNull(message = "O ID do usuário é obrigatório.") Long userId
+        @NotNull(message = "O tipo da categoria é obrigatório.") CategoryType type
 ) {}
