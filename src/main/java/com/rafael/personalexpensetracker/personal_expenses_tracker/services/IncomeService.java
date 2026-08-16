@@ -7,48 +7,41 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.Cate
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.SavingsBoxEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.IncomeRepository;
-import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
 public class IncomeService {
     private final IncomeRepository incomeRepository;
-    private final UserRepository userRepository;
+    private final AuthenticatedUserService authenticatedUserService;
     private final BalanceService balanceService;
     private final CategoryService categoryService;
 
-    public IncomeService(IncomeRepository incomeRepository, UserRepository userRepository,
+    public IncomeService(IncomeRepository incomeRepository, AuthenticatedUserService authenticatedUserService,
                          BalanceService balanceService, CategoryService categoryService) {
         this.incomeRepository = incomeRepository;
-        this.userRepository = userRepository;
+        this.authenticatedUserService = authenticatedUserService;
         this.balanceService = balanceService;
         this.categoryService = categoryService;
     }
 
     @Transactional
-    public IncomeResponseDto create(IncomeRequestDto request) {
-        UserEntity user = userRepository.findById(request.userId()).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Usuário com ID " + request.userId() + " não encontrado."
-        ));
+    public IncomeResponseDto create(IncomeRequestDto request, String email) {
+        UserEntity user = authenticatedUserService.require(email);
         SavingsBoxEntity box = balanceService.credit(
                 user, request.destination(), request.savingsBoxId(), request.amount()
         );
         var category = categoryService.findForUserAndType(
-                request.categoryId(), request.userId(), CategoryType.INCOME);
+                request.categoryId(), user.getUserId(), CategoryType.INCOME);
         return toResponse(incomeRepository.save(new IncomeEntity(
                 request.description(), request.amount(), category, request.destination(), user, box
         )));
     }
 
-    public List<IncomeResponseDto> findByUserId(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID " + userId + " não encontrado.");
-        }
+    public List<IncomeResponseDto> findByUser(String email) {
+        Long userId = authenticatedUserService.require(email).getUserId();
         return incomeRepository.findByUser_UserId(userId).stream().map(this::toResponse).toList();
     }
 

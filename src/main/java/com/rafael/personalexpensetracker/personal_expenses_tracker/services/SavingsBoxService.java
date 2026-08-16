@@ -6,10 +6,7 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.SavingsBoxEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.SavingsBoxRepository;
-import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.UserRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,40 +14,35 @@ import java.util.List;
 @Service
 public class SavingsBoxService {
     private final SavingsBoxRepository savingsBoxRepository;
-    private final UserRepository userRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
-    public SavingsBoxService(SavingsBoxRepository savingsBoxRepository, UserRepository userRepository) {
+    public SavingsBoxService(SavingsBoxRepository savingsBoxRepository, AuthenticatedUserService authenticatedUserService) {
         this.savingsBoxRepository = savingsBoxRepository;
-        this.userRepository = userRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
-    public SavingsBoxResponseDto create(SavingsBoxRequestDto request) {
-        UserEntity user = findUser(request.userId());
+    public SavingsBoxResponseDto create(SavingsBoxRequestDto request, String email) {
+        UserEntity user = authenticatedUserService.require(email);
         return toResponse(savingsBoxRepository.save(
                 new SavingsBoxEntity(request.name(), request.initialBalance(), user)
         ));
     }
 
-    public List<SavingsBoxResponseDto> findByUserId(Long userId) {
-        findUser(userId);
+    public List<SavingsBoxResponseDto> findByUser(String email) {
+        Long userId = authenticatedUserService.require(email).getUserId();
         return savingsBoxRepository.findByUser_UserId(userId).stream().map(this::toResponse).toList();
     }
 
-    public BalanceResponseDto getBalance(Long userId) {
-        UserEntity user = findUser(userId);
-        List<SavingsBoxResponseDto> boxes = findByUserId(userId);
+    public BalanceResponseDto getBalance(String email) {
+        UserEntity user = authenticatedUserService.require(email);
+        Long userId = user.getUserId();
+        List<SavingsBoxResponseDto> boxes = savingsBoxRepository.findByUser_UserId(userId).stream().map(this::toResponse).toList();
         BigDecimal boxesBalance = boxes.stream()
                 .map(SavingsBoxResponseDto::balance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return new BalanceResponseDto(
                 userId, user.getBalance(), boxesBalance, user.getBalance().add(boxesBalance), boxes
         );
-    }
-
-    private UserEntity findUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Usuário com ID " + id + " não encontrado."
-        ));
     }
 
     private SavingsBoxResponseDto toResponse(SavingsBoxEntity box) {

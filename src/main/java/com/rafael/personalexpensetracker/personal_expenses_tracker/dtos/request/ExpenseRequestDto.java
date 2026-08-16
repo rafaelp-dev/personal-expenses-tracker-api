@@ -18,9 +18,6 @@ public record ExpenseRequestDto(
         @Positive(message = "O preço do gasto deve ser maior do que 0.")
         BigDecimal price,
 
-        @NotNull(message = "O ID de usuário não pode estar vazio.")
-        Long userId,
-
         BalanceSource source,
 
         Long savingsBoxId

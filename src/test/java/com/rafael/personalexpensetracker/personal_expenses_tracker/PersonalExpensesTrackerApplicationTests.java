@@ -37,7 +37,7 @@ class PersonalExpensesTrackerApplicationTests {
 
     @Test
     void shouldRejectRequestWithoutToken() throws Exception {
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get("/users/me"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -77,9 +77,10 @@ class PersonalExpensesTrackerApplicationTests {
         JsonNode response = objectMapper.readTree(loginResult.getResponse().getContentAsString());
         String token = response.get("accessToken").asText();
 
-        mockMvc.perform(get("/users")
+        mockMvc.perform(get("/users/me")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.services.Expe
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,36 +21,36 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExpenseResponseDto>> getAllExpenses(){
-        List<ExpenseResponseDto> expenseResponseDtos = expenseService.getAllExpenses();
+    public ResponseEntity<List<ExpenseResponseDto>> getAllExpenses(Authentication authentication){
+        List<ExpenseResponseDto> expenseResponseDtos = expenseService.getAllExpenses(authentication.getName());
 
         return ResponseEntity.ok().body(expenseResponseDtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ExpenseResponseDto> getExpenseById(@PathVariable Long id){
-        ExpenseResponseDto expenseResponseDto = expenseService.getExpenseById(id);
+    public ResponseEntity<ExpenseResponseDto> getExpenseById(@PathVariable Long id, Authentication authentication){
+        ExpenseResponseDto expenseResponseDto = expenseService.getExpenseById(id, authentication.getName());
 
         return ResponseEntity.ok().body(expenseResponseDto);
     }
 
     @PostMapping
-    public ResponseEntity<ExpenseResponseDto> createExpense(@Valid @RequestBody ExpenseRequestDto expenseRequestDto){
-        ExpenseResponseDto expenseResponseDto = expenseService.createExpense(expenseRequestDto);
+    public ResponseEntity<ExpenseResponseDto> createExpense(@Valid @RequestBody ExpenseRequestDto expenseRequestDto, Authentication authentication){
+        ExpenseResponseDto expenseResponseDto = expenseService.createExpense(expenseRequestDto, authentication.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(expenseResponseDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExpenseById(@PathVariable Long id){
-        expenseService.deleteExpenseById(id);
+    public ResponseEntity<Void> deleteExpenseById(@PathVariable Long id, Authentication authentication){
+        expenseService.deleteExpenseById(id, authentication.getName());
 
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ExpenseResponseDto> updateExpense(@PathVariable Long id, @RequestBody ExpenseRequestDto expenseRequestDto){
-        ExpenseResponseDto expenseResponseDto = expenseService.updateExpense(id, expenseRequestDto);
+    public ResponseEntity<ExpenseResponseDto> updateExpense(@PathVariable Long id, @RequestBody ExpenseRequestDto expenseRequestDto, Authentication authentication){
+        ExpenseResponseDto expenseResponseDto = expenseService.updateExpense(id, expenseRequestDto, authentication.getName());
 
         return ResponseEntity.ok().body(expenseResponseDto);
     }

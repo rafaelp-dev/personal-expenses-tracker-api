@@ -5,6 +5,7 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.IncomeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +19,7 @@ public class IncomeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public IncomeResponseDto create(@Valid @RequestBody IncomeRequestDto request) {
-        return incomeService.create(request);
+    public IncomeResponseDto create(@Valid @RequestBody IncomeRequestDto request, Authentication authentication) {
+        return incomeService.create(request, authentication.getName());
     }
 }

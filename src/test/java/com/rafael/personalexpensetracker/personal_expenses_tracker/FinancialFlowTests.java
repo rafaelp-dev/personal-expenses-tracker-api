@@ -38,58 +38,61 @@ class FinancialFlowTests {
 
     @Test
     void shouldCreditAndDebitMainBalanceAndRefundDeletedExpense() {
-        Long userId = createUser("main@example.com").id();
-        Long incomeCategoryId = createCategory("Salário", CategoryType.INCOME, userId);
-        Long expenseCategoryId = createCategory("Moradia", CategoryType.EXPENSE, userId);
+        String email = "main@example.com";
+        createUser(email);
+        Long incomeCategoryId = createCategory("Salário", CategoryType.INCOME, email);
+        Long expenseCategoryId = createCategory("Moradia", CategoryType.EXPENSE, email);
         incomeService.create(new IncomeRequestDto(
-                "Salário", new BigDecimal("3000.00"), incomeCategoryId, userId, BalanceSource.MAIN, null
-        ));
+                "Salário", new BigDecimal("3000.00"), incomeCategoryId, BalanceSource.MAIN, null
+        ), email);
 
         var expense = expenseService.createExpense(new ExpenseRequestDto(
-                "Aluguel", expenseCategoryId, new BigDecimal("1200.00"), userId, BalanceSource.MAIN, null
-        ));
-        assertEquals(new BigDecimal("1800.00"), savingsBoxService.getBalance(userId).mainBalance());
+                "Aluguel", expenseCategoryId, new BigDecimal("1200.00"), BalanceSource.MAIN, null
+        ), email);
+        assertEquals(new BigDecimal("1800.00"), savingsBoxService.getBalance(email).mainBalance());
 
-        expenseService.deleteExpenseById(expense.expenseId());
-        assertEquals(new BigDecimal("3000.00"), savingsBoxService.getBalance(userId).mainBalance());
+        expenseService.deleteExpenseById(expense.expenseId(), email);
+        assertEquals(new BigDecimal("3000.00"), savingsBoxService.getBalance(email).mainBalance());
     }
 
     @Test
     void shouldCreditAndDebitSavingsBox() {
-        Long userId = createUser("box@example.com").id();
-        Long incomeCategoryId = createCategory("Extra", CategoryType.INCOME, userId);
-        Long expenseCategoryId = createCategory("Viagem", CategoryType.EXPENSE, userId);
+        String email = "box@example.com";
+        createUser(email);
+        Long incomeCategoryId = createCategory("Extra", CategoryType.INCOME, email);
+        Long expenseCategoryId = createCategory("Viagem", CategoryType.EXPENSE, email);
         SavingsBoxResponseDto box = savingsBoxService.create(new SavingsBoxRequestDto(
-                "Viagem", userId, new BigDecimal("500.00")
-        ));
+                "Viagem", new BigDecimal("500.00")
+        ), email);
         incomeService.create(new IncomeRequestDto(
-                "Extra", new BigDecimal("200.00"), incomeCategoryId, userId, BalanceSource.SAVINGS_BOX, box.id()
-        ));
+                "Extra", new BigDecimal("200.00"), incomeCategoryId, BalanceSource.SAVINGS_BOX, box.id()
+        ), email);
         expenseService.createExpense(new ExpenseRequestDto(
-                "Passagem", expenseCategoryId, new BigDecimal("250.00"), userId,
+                "Passagem", expenseCategoryId, new BigDecimal("250.00"),
                 BalanceSource.SAVINGS_BOX, box.id()
-        ));
+        ), email);
 
-        BalanceResponseDto balance = savingsBoxService.getBalance(userId);
+        BalanceResponseDto balance = savingsBoxService.getBalance(email);
         assertEquals(new BigDecimal("450.00"), balance.savingsBoxesBalance());
         assertEquals(new BigDecimal("450.00"), balance.totalBalance());
     }
 
     @Test
     void shouldRejectExpenseWithoutEnoughFunds() {
-        Long userId = createUser("empty@example.com").id();
-        Long expenseCategoryId = createCategory("Outros", CategoryType.EXPENSE, userId);
+        String email = "empty@example.com";
+        createUser(email);
+        Long expenseCategoryId = createCategory("Outros", CategoryType.EXPENSE, email);
 
         assertThrows(ResponseStatusException.class, () -> expenseService.createExpense(new ExpenseRequestDto(
-                "Compra", expenseCategoryId, new BigDecimal("10.00"), userId, BalanceSource.MAIN, null
-        )));
+                "Compra", expenseCategoryId, new BigDecimal("10.00"), BalanceSource.MAIN, null
+        ), email));
     }
 
     private UserResponseDto createUser(String email) {
         return userService.createUser(new UserRequestDto("Test", email, "test-password"));
     }
 
-    private Long createCategory(String name, CategoryType type, Long userId) {
-        return categoryService.create(new CategoryRequestDto(name, type, userId)).id();
+    private Long createCategory(String name, CategoryType type, String email) {
+        return categoryService.create(new CategoryRequestDto(name, type), email).id();
     }
 }

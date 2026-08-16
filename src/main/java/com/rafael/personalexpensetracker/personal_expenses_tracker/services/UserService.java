@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 
 @Service
 public class UserService {
@@ -21,12 +20,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UserResponseDto> getAllUsers() {
-        return userRepository.findAll().stream().map(this::toResponse).toList();
-    }
-
-    public UserResponseDto getUserById(Long id) {
-        return toResponse(findUser(id));
+    public UserResponseDto getAuthenticatedUser(String email) {
+        return toResponse(findUser(email));
     }
 
     public UserResponseDto createUser(UserRequestDto request) {
@@ -42,15 +37,12 @@ public class UserService {
         return toResponse(userRepository.save(user));
     }
 
-    public void deleteUserById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário com ID " + id + " não encontrado.");
-        }
-        userRepository.deleteById(id);
+    public void deleteAuthenticatedUser(String email) {
+        userRepository.delete(findUser(email));
     }
 
-    public UserResponseDto updateUser(Long id, UserRequestDto request) {
-        UserEntity user = findUser(id);
+    public UserResponseDto updateAuthenticatedUser(String email, UserRequestDto request) {
+        UserEntity user = findUser(email);
 
         if (request.name() != null) user.setName(request.name());
         if (request.email() != null && !request.email().equals(user.getEmail())) {
@@ -64,11 +56,10 @@ public class UserService {
         return toResponse(userRepository.save(user));
     }
 
-    private UserEntity findUser(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Usuário com ID " + id + " não encontrado."
-                ));
+    private UserEntity findUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "Usuário autenticado não encontrado."));
     }
 
     private UserResponseDto toResponse(UserEntity user) {
