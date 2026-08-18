@@ -10,6 +10,8 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.Savi
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.ExpenseRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,7 +35,7 @@ public class ExpenseService {
     }
 
     public List<ExpenseResponseDto> getAllExpenses(String email) {
-        return findByUserId(authenticatedUserService.require(email).getUserId());
+        return findByUser(authenticatedUserService.require(email).getUserId());
     }
 
     public ExpenseResponseDto getExpenseById(Long id, String email) {
@@ -94,8 +96,13 @@ public class ExpenseService {
         return toResponse(expenseRepository.save(expense));
     }
 
-    private List<ExpenseResponseDto> findByUserId(Long id) {
+    public List<ExpenseResponseDto> findByUser(Long id) {
         return expenseRepository.findByUser_UserId(id).stream().map(this::toResponse).toList();
+    }
+
+    public Page<ExpenseResponseDto> findByUser(String email, Pageable pageable) {
+        Long userId = authenticatedUserService.require(email).getUserId();
+        return expenseRepository.findByUser_UserId(userId, pageable).map(this::toResponse);
     }
 
     private Long resolveBoxId(ExpenseRequestDto request, ExpenseEntity expense,

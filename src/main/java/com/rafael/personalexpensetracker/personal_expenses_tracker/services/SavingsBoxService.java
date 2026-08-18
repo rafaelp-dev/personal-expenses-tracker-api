@@ -29,12 +29,18 @@ public class SavingsBoxService {
     }
 
     public List<SavingsBoxResponseDto> findByUser(String email) {
-        Long userId = authenticatedUserService.require(email).getUserId();
+        return findByUser(authenticatedUserService.require(email).getUserId());
+    }
+
+    public List<SavingsBoxResponseDto> findByUser(Long userId) {
         return savingsBoxRepository.findByUser_UserId(userId).stream().map(this::toResponse).toList();
     }
 
     public BalanceResponseDto getBalance(String email) {
-        UserEntity user = authenticatedUserService.require(email);
+        return getBalance(authenticatedUserService.require(email));
+    }
+
+    public BalanceResponseDto getBalance(UserEntity user) {
         Long userId = user.getUserId();
         List<SavingsBoxResponseDto> boxes = savingsBoxRepository.findByUser_UserId(userId).stream().map(this::toResponse).toList();
         BigDecimal boxesBalance = boxes.stream()

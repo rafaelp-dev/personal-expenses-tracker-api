@@ -17,6 +17,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class RoutineTaskService {
@@ -48,10 +51,29 @@ public class RoutineTaskService {
     @Transactional
     public List<RoutineChecklistItemResponseDto> checklist(String email, LocalDate date) {
         Long userId = authenticatedUserService.require(email).getUserId();
-        return taskRepository.findByUser_UserIdOrderByTitleAsc(userId).stream()
+        return checklist(userId, date);
+    }
+
+    @Transactional
+    public List<RoutineChecklistItemResponseDto> checklist(Long userId, LocalDate date) {
+        List<RoutineTaskEntity> tasks = taskRepository.findByUser_UserIdOrderByTitleAsc(userId).stream()
                 .filter(task -> occursOn(task, date))
-                .map(task -> occurrenceRepository.findByRoutineTask_IdAndDate(task.getId(), date)
-                        .orElseGet(() -> occurrenceRepository.save(new RoutineTaskOccurrenceEntity(task, date))))
+                .toList();
+        if (tasks.isEmpty()) return List.of();
+
+        Map<Long, RoutineTaskOccurrenceEntity> occurrences = occurrenceRepository
+                .findByRoutineTask_IdInAndDate(tasks.stream().map(RoutineTaskEntity::getId).toList(), date)
+                .stream()
+                .collect(Collectors.toMap(item -> item.getRoutineTask().getId(), Function.identity()));
+
+        List<RoutineTaskOccurrenceEntity> missing = tasks.stream()
+                .filter(task -> !occurrences.containsKey(task.getId()))
+                .map(task -> new RoutineTaskOccurrenceEntity(task, date))
+                .toList();
+        occurrenceRepository.saveAll(missing).forEach(item -> occurrences.put(item.getRoutineTask().getId(), item));
+
+        return tasks.stream()
+                .map(task -> occurrences.get(task.getId()))
                 .map(this::toChecklistResponse)
                 .toList();
     }

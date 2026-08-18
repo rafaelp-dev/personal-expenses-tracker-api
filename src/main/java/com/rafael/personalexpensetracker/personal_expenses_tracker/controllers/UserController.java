@@ -10,6 +10,8 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.services.Inco
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.SavingsBoxService;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.services.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,9 +60,19 @@ public class UserController {
         return ResponseEntity.ok().body(expenseResponseDtos);
     }
 
+    @GetMapping("/me/expenses/page")
+    public Page<ExpenseResponseDto> getUserExpensesPage(Authentication authentication, Pageable pageable) {
+        return expenseService.findByUser(authentication.getName(), pageable);
+    }
+
     @GetMapping("/me/incomes")
     public ResponseEntity<List<IncomeResponseDto>> getUserIncomes(Authentication authentication) {
         return ResponseEntity.ok(incomeService.findByUser(authentication.getName()));
+    }
+
+    @GetMapping("/me/incomes/page")
+    public Page<IncomeResponseDto> getUserIncomesPage(Authentication authentication, Pageable pageable) {
+        return incomeService.findByUser(authentication.getName(), pageable);
     }
 
     @GetMapping("/me/savings-boxes")

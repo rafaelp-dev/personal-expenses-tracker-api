@@ -8,6 +8,8 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.Savi
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.UserEntity;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.IncomeRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,8 +43,16 @@ public class IncomeService {
     }
 
     public List<IncomeResponseDto> findByUser(String email) {
-        Long userId = authenticatedUserService.require(email).getUserId();
+        return findByUser(authenticatedUserService.require(email).getUserId());
+    }
+
+    public List<IncomeResponseDto> findByUser(Long userId) {
         return incomeRepository.findByUser_UserId(userId).stream().map(this::toResponse).toList();
+    }
+
+    public Page<IncomeResponseDto> findByUser(String email, Pageable pageable) {
+        Long userId = authenticatedUserService.require(email).getUserId();
+        return incomeRepository.findByUser_UserId(userId, pageable).map(this::toResponse);
     }
 
     private IncomeResponseDto toResponse(IncomeEntity income) {

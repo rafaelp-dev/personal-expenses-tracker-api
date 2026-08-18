@@ -5,6 +5,8 @@ import com.rafael.personalexpensetracker.personal_expenses_tracker.dtos.response
 import com.rafael.personalexpensetracker.personal_expenses_tracker.entities.*;
 import com.rafael.personalexpensetracker.personal_expenses_tracker.repositories.TransferRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,9 +43,17 @@ public class TransferService {
     }
 
     public List<TransferResponseDto> findByUser(String email) {
-        Long userId = authenticatedUserService.require(email).getUserId();
+        return findByUser(authenticatedUserService.require(email).getUserId());
+    }
+
+    public List<TransferResponseDto> findByUser(Long userId) {
         return transferRepository.findByUser_UserIdOrderByDateDesc(userId).stream()
                 .map(this::toResponse).toList();
+    }
+
+    public Page<TransferResponseDto> findByUser(String email, Pageable pageable) {
+        Long userId = authenticatedUserService.require(email).getUserId();
+        return transferRepository.findByUser_UserId(userId, pageable).map(this::toResponse);
     }
 
     private TransferResponseDto toResponse(TransferEntity transfer) {
